@@ -984,8 +984,11 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
             visitRecursive(expl, copier);
 
             std::cout << "Save WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
+            std::filesystem::path savePath =
+                std::filesystem::current_path() / "test_output/WhistlingPlainsFPMain.scene";
             entlib.saveJsonFile(
-                &newDoc, "WhistlingPlainsFPMain.scene", expl.getSchema()->name.c_str());
+                &newDoc, savePath.generic_string().c_str(),
+                expl.getSchema()->name.c_str());
 
             std::cout << "CompareCursor WhistlingPlainsFPMain.scene wth the clone" << std::endl;
             CompareCursor comparator(destExpl);

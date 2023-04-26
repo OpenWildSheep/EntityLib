@@ -678,7 +678,10 @@ namespace Ent
             }
             // We don't want to add "$schema" in doc because sometime it is not the root node
             json copy = *doc;
-            copy["$schema"] = format(schemaFormat, _schema);
+            if (_schema != nullptr)
+            {
+                copy["$schema"] = format(schemaFormat, _schema);
+            }
             ofs << copy.dump(4);
         }
         try3Times([&] { rename(tempFilename, absPath); });
@@ -703,18 +706,47 @@ namespace Ent
         }
     }
 
-    std::vector<std::filesystem::path> EntityLib::collectOutdatedJsonFiles() const
+    void EntityLib::saveJsonFileDatabase(char const* _customRootpath) const
     {
-        std::vector<std::filesystem::path> collectedPaths;
+        for (auto const& [path, versionedJson] : m_jsonDatabase)
+        {
+            std::filesystem::path savePath = path;
+            if (_customRootpath != nullptr)
+            {
+                std::filesystem::path relPath = relative(savePath, rawdataPath);
+                savePath = _customRootpath / relPath;
+            }
+            auto const absPath = getAbsolutePath(savePath);
+            auto const tempFilename = std::filesystem::path(absPath.string() + ".tmp");
+            create_directories(tempFilename.parent_path());
+            {
+                std::ofstream ofs(tempFilename);
+                if (not ofs.is_open())
+                {
+                    throw ContextException("Can't open %s for write", tempFilename.string().c_str());
+                }
+                json copy = versionedJson->document;
+                ofs << copy.dump(4);
+            }
+            try3Times([&] { rename(tempFilename, absPath); });
+        }
+    }
 
-        for (auto const& iter : m_jsonDatabase)
+    std::vector<std::pair<std::filesystem::path, JSonFileState>> EntityLib::collectOutdatedJsonFiles() const
+    {
+        std::vector<std::pair<std::filesystem::path, JSonFileState>> collectedPaths;
+
+        for (auto const& [path, versionedJson] : m_jsonDatabase)
         {
             auto error = std::error_code{};
-            auto const timestamp = last_write_time(iter.first, error);
-            if (error || timestamp > iter.second->metadata.time)
+            auto const timestamp = last_write_time(path, error);
+            if (error)
             {
-                // either the file does not exist on disk anymore, or it was changed and is now outdated
-                collectedPaths.push_back(iter.first);
+                collectedPaths.push_back(std::pair(path, JSonFileState::Deleted));
+            }
+            else if (timestamp > versionedJson->metadata.time)
+            {
+                collectedPaths.push_back(std::pair(path, JSonFileState::Modified));
             }
         }
 
@@ -727,7 +759,8 @@ namespace Ent
         {
             if (auto const iter = m_jsonDatabase.find(absPath); iter != m_jsonDatabase.end())
             {
-                iter->second->document = loadJsonFile(rawdataPath, iter->first);
+                auto const& [path, versionedJson] = *iter;
+                versionedJson->document = loadJsonFile(rawdataPath, path);
                 auto error = std::error_code{};
                 auto const timestamp = last_write_time(absPath, error);
                 if (error)
@@ -737,12 +770,15 @@ namespace Ent
                 }
                 else
                 {
-                    iter->second->metadata.time = timestamp;
+                    versionedJson->metadata.time = timestamp;
                 }
             }
             else
             {
-                throw FileSystemError("Trying to reload file that was never loaded in the first place", rawdataPath, iter->first);
+                throw FileSystemError(
+                    "Trying to reload file that was never loaded in the first place",
+                    rawdataPath,
+                    absPath);
             }
         }
     }
@@ -2101,21 +2137,21 @@ namespace Ent
         if (_path.is_absolute())
         {
             // Check if _path is inside rawdataPath
-            std::filesystem::path parrent = _path;
+            std::filesystem::path parent = _path;
             std::filesystem::path relPath;
-            while (parrent != rawdataPath)
+            while (parent != rawdataPath)
             {
-                if (parrent.has_parent_path() and parrent.parent_path() != parrent)
+                if (parent.has_parent_path() and parent.parent_path() != parent)
                 {
                     if (relPath.empty())
                     {
-                        relPath = parrent.filename();
+                        relPath = parent.filename();
                     }
                     else
                     {
-                        relPath = parrent.filename() / relPath;
+                        relPath = parent.filename() / relPath;
                     }
-                    parrent = parrent.parent_path();
+                    parent = parent.parent_path();
                 }
                 else
                 {

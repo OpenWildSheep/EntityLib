@@ -542,7 +542,7 @@ namespace Ent
     PropImplPtr PropImpl::makeInstanceOf()
     {
         _reResolveIfNeeded();
-        auto& jsonDoc = m_entityLib->createTempJsonFile();
+        auto& jsonDoc = m_entityLib->createTempJsonFile(getSchema()->name.c_str());
         if (auto prefabPath = m_instance.getFilePath())
         {
             // If it has no FilePath, it isn't a root node, so we can't reference it in an InstanceOf path

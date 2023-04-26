@@ -34,7 +34,7 @@ namespace Ent
 
     Property Property::detach()
     {
-        auto& jsonFile = getEntityLib()->createTempJsonFile();
+        auto& jsonFile = getEntityLib()->createTempJsonFile(getSchema()->name.c_str());
         Property detached(getEntityLib()->newPropImpl(
             nullptr, getSchema(), "", &jsonFile.document, &jsonFile.metadata));
         CopyProperty copier(
@@ -56,7 +56,7 @@ namespace Ent
             return copy;
         }
         // If "this" has no prefab, create an empty document, then copy only overrides
-        auto& jsonFile = getEntityLib()->createTempJsonFile();
+        auto& jsonFile = getEntityLib()->createTempJsonFile(getSchema()->name.c_str());
         Property copy(getEntityLib()->newPropImpl(
             nullptr, getSchema(), "", &jsonFile.document, &jsonFile.metadata));
         CopyProperty copier(copy, OverrideValueSource::Override, CopyMode::CopyOverride);
@@ -73,7 +73,7 @@ namespace Ent
             throw ContextException("Can't applyToPrefab since Property has no prefab");
         }
         auto const* const prefabPath = prefabSource->getFilePath();
-        auto& newJson = getEntityLib()->createTempJsonFile();
+        auto& newJson = getEntityLib()->createTempJsonFile(getSchema()->name.c_str());
         newJson.document = getEntityLib()->readJsonFile(prefabPath).document;
         auto const clonedPrefab = Property(getEntityLib(), getSchema(), prefabPath, newJson);
         CopyProperty copier(

@@ -209,6 +209,16 @@ try
     entlib.validationEnabled = prevValidationEnabled;
 
     {
+        auto ent = Gen::Entity::create(entlib);
+        ent.save("test_output/test_create.entity");
+        Gen::Entity::load(entlib, "test_output/test_create.entity");
+    }
+    {
+        auto ent = entlib.newProperty(entlib.getSchema("Entity"));
+        ent.save("test_output/test_create2.entity");
+        entlib.loadProperty("test_output/test_create2.entity");
+    }
+    {
         auto ent = Gen::Entity::loadCopy(entlib, "instance.entity");
         auto strings = ent.Components().UnitTestComponent()->SimpleArray();
         ENTLIB_ASSERT(strings.getPrefab()->size() == 5);

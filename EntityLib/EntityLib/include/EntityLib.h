@@ -229,7 +229,7 @@ namespace Ent
         Property newProperty(Subschema const* _schema);
 
         VersionedJson& readJsonFile(char const* _filepath) const;
-        VersionedJson& createTempJsonFile() const;
+        VersionedJson& createTempJsonFile(char const* _schemaName) const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
         std::vector<std::filesystem::path> collectOutdatedJsonFiles() const;
         void reloadJsonFiles(std::vector<std::filesystem::path> const& _filePaths) const;

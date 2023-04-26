@@ -767,7 +767,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<EntityLib*, Subschema const*, char const*, nlohmann::json*, JsonMetaData*>(), py::keep_alive<1, 2>())
         .def_static("create", [](EntityLib* _lib, Subschema const* _schema, char const* _path, nlohmann::json* _data)
         {
-            auto& newFile = _lib->createTempJsonFile();
+            auto& newFile = _lib->createTempJsonFile(_schema->name.c_str());
             if (_data != nullptr && !_data->is_null()) // Python convert None to json::null, so _data is never nullptr
             {
                 newFile.document = *_data;

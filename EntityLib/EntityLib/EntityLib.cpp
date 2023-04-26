@@ -587,7 +587,7 @@ namespace Ent
 
     Property EntityLib::loadPropertyCopy(char const* _schemaName, char const* _filepath)
     {
-        auto& copy = createTempJsonFile();
+        auto& copy = createTempJsonFile(_schemaName);
         auto& storage = readJsonFile(_filepath);
         copy.document = storage.document;
         return Property(this, getSchema(_schemaName), _filepath, copy);
@@ -595,7 +595,7 @@ namespace Ent
 
     Property EntityLib::loadPropertyCopy(char const* _filepath)
     {
-        auto& copy = createTempJsonFile();
+        auto& copy = createTempJsonFile(nullptr);
         auto& storage = readJsonFile(_filepath);
         copy.document = storage.document;
         auto const schemaName = std::string(loadFunc(copy.document, _filepath));
@@ -604,7 +604,7 @@ namespace Ent
 
     Property EntityLib::newProperty(Subschema const* _schema)
     {
-        auto& storage = createTempJsonFile();
+        auto& storage = createTempJsonFile(_schema->name.c_str());
         return Property(this, _schema, "", storage);
     }
 
@@ -634,9 +634,14 @@ namespace Ent
         return *m_jsonDatabase.emplace(absPath, std::move(file)).first->second;
     }
 
-    VersionedJson& EntityLib::createTempJsonFile() const
+    VersionedJson& EntityLib::createTempJsonFile(char const* _schemaName) const
     {
-        return *m_tempJsonFiles.emplace_back(std::make_unique<VersionedJson>());
+        auto& doc = *m_tempJsonFiles.emplace_back(std::make_unique<VersionedJson>());
+        if (_schemaName != nullptr and strlen(_schemaName) != 0)
+        {
+            doc.document["$schema"] = format(schemaFormat, _schemaName);
+        }
+        return doc;
     }
 
     template <typename Lambda>
@@ -671,6 +676,7 @@ namespace Ent
             {
                 throw ContextException("Can't open %s for write", tempFilename.string().c_str());
             }
+            // We don't want to add "$schema" in doc because sometime it is not the root node
             json copy = *doc;
             if (_schema != nullptr)
             {

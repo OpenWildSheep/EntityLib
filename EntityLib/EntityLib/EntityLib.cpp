@@ -2139,9 +2139,9 @@ namespace Ent
             // Check if _path is inside rawdataPath
             std::filesystem::path parent = _path;
             std::filesystem::path relPath;
-            while (parent != rawdataPath)
+            while (!equivalent(parent, rawdataPath))
             {
-                if (parent.has_parent_path() and parent.parent_path() != parent)
+                if (parent.has_parent_path() and !equivalent(parent.parent_path(), parent))
                 {
                     if (relPath.empty())
                     {

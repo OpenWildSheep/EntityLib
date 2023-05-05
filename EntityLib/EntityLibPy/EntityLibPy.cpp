@@ -20,24 +20,6 @@ using namespace Ent;
 
 using Value = std::variant<Null, std::string, double, int64_t, bool, EntityRef>;
 
-Value getValue(Node& node)
-{
-    switch (node.getDataType())
-    {
-    case DataType::array:
-    case DataType::object:
-    case DataType::oneOf:
-    case DataType::null: return nullptr;
-    case DataType::boolean: return node.getBool();
-    case DataType::integer: return node.getInt();
-    case DataType::number: return node.getFloat();
-    case DataType::string: return std::string(node.getString());
-    case DataType::entityRef: return node.getEntityRef();
-    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
-    }
-    return {};
-}
-
 Value getPropValue(Property const& _prop)
 {
     switch (_prop.getDataType())
@@ -51,24 +33,6 @@ Value getPropValue(Property const& _prop)
     case DataType::number: return _prop.getFloat();
     case DataType::string: return std::string(_prop.getString());
     case DataType::entityRef: return _prop.getEntityRef();
-    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
-    }
-    return {};
-}
-
-Value getDefaultValue(Node& node)
-{
-    switch (node.getDataType())
-    {
-    case DataType::array:
-    case DataType::object:
-    case DataType::oneOf:
-    case DataType::null: return nullptr;
-    case DataType::boolean: return node.getDefaultBool();
-    case DataType::integer: return node.getDefaultInt();
-    case DataType::number: return node.getDefaultFloat();
-    case DataType::string: return std::string(node.getDefaultString());
-    case DataType::entityRef: return node.getDefaultEntityRef();
     case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
     return {};
@@ -121,23 +85,6 @@ struct GetValue
     }
 };
 
-void setValue(Node& node, Value const& val)
-{
-    switch (node.getDataType())
-    {
-    case DataType::array:
-    case DataType::object:
-    case DataType::oneOf:
-    case DataType::null: break;
-    case DataType::boolean: node.setBool(std::visit(GetValue<bool>{}, val)); break;
-    case DataType::integer: node.setInt(std::visit(GetValue<int64_t>{}, val)); break;
-    case DataType::number: node.setFloat(std::visit(GetValue<double>{}, val)); break;
-    case DataType::string: node.setString(std::visit(GetValue<std::string>{}, val).c_str()); break;
-    case DataType::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
-    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
-    }
-}
-
 void setPropValue(Property& node, Value const& val)
 {
     switch (node.getDataType())
@@ -153,31 +100,6 @@ void setPropValue(Property& node, Value const& val)
     case DataType::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
     case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
-}
-
-static py::list nodeGetKey(Node* _node)
-{
-    auto const type = _node->getKeyType();
-    py::list arr;
-    if (type == DataType::string || type == DataType::entityRef)
-    {
-        for (auto const& key : _node->getKeysString())
-        {
-            arr.append(py::str(key.c_str()));
-        }
-    }
-    else if (type == DataType::integer)
-    {
-        for (auto key : _node->getKeysInt())
-        {
-            arr.append(key);
-        }
-    }
-    else
-    {
-        throw std::runtime_error("Unexpected key type");
-    }
-    return arr;
 }
 
 static py::list propMapGetKeys(Property& _prop)
@@ -503,158 +425,18 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * NOTE: it wasn't strictly to pre-declare ALL classes to fix the issues we currently had,
      * but it just seemed safer in case we add new methods with new dependencies.
      */
-    auto pyNode = py::class_<Node, NodeUniquePtr>(ent, "Node");
     // Make python internally use shared_ptr for Entity and Scene
     auto pyComponentsSchema = py::class_<ComponentsSchema>(ent, "ComponentsSchema");
     auto pyColor = py::class_<std::array<uint8_t, 4>>(ent, "Color");
     auto pyEntityLib = py::class_<EntityLib>(ent, "EntityLib");
     auto pyEntityRef = py::class_<EntityRef>(ent, "EntityRef");
-    auto pyNodeFile = py::class_<EntityLib::NodeFile>(ent, "NodeFile");
-    auto pyPrefabInfo = py::class_<Node::PrefabInfo>(ent, "Node_PrefabInfo");
     auto pyPropPrefabInfo = py::class_<PrefabInfo>(ent, "Prop_PrefabInfo");
     auto pyProperty = py::class_<Property>(ent, "Property");
-
-    pyPrefabInfo
-        .def_readonly("node", &Node::PrefabInfo::node)
-        .def_readonly("noderef", &Node::PrefabInfo::nodeRef)
-        .def_readonly("prefab_path", &Node::PrefabInfo::prefabPath)
-        ;
 
     pyPropPrefabInfo
         .def_readonly("node", &PrefabInfo::prop)
         .def_readonly("noderef", &PrefabInfo::nodeRef)
         .def_readonly("prefab_path", &PrefabInfo::prefabPath)
-        ;
-
-    pyNode
-        // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
-        .def("get_ptr", [](Node* self) {return (intptr_t)self;})
-        .def_static("from_ptr", [](intptr_t _ptr) {return (Node*)_ptr;}, py::return_value_policy::reference_internal)
-        .def("has_override", &Node::hasOverride)
-        .def("has_prefab_value", &Node::hasPrefabValue)
-        .def("has_default_value", &Node::hasDefaultValue)
-        .def("get_entitylib", &Node::getEntityLib)
-        .def_property_readonly("datatype", [](Node const* node) { return node->getDataType(); })
-        .def(
-            "at",
-            [](Node* node, char const* field) { return node->at(field); },
-            py::return_value_policy::reference_internal,
-            "In an Object, get the property by name")
-        .def("count", [](Node* node, char const* field) { return node->count(field); })
-        .def("get_field_names", &Node::getFieldNames)
-        .def_property_readonly("fields",
-            &Node::getFields,
-            py::return_value_policy::reference_internal)
-        .def(
-            "at",
-            [](Node* node, size_t i) { return node->at(i); },
-            py::return_value_policy::reference_internal,
-            "In an Array, get the element by index")
-        .def(
-            "__getitem__",
-            [](Node* node, size_t i) { return node->at(i); },
-            py::return_value_policy::reference_internal)
-        .def("size", [](Node* node) { return node->size(); })
-        .def("__len__", [](Node* node) { return node->size(); })
-        .def("get_raw_size", &Node::getRawSize)
-        .def(
-            "get_items",
-            [](Node* node) { return node->getItems(); },
-            py::return_value_policy::reference_internal)
-        .def_property_readonly(
-            "items",
-            [](Node* node) { return node->getItems(); },
-            py::return_value_policy::reference_internal)
-        .def(
-            "push", [](Node* node) { return node->push(); }, py::return_value_policy::reference_internal)
-        .def("pop", [](Node* node) { node->pop(); })
-        .def("clear", [](Node* node) { return node->clear(); })
-        .def("empty", [](Node* node) { return node->empty(); })
-        .def_property_readonly("instance_of", [](Node* node) { return node->getInstanceOf(); })
-        .def("get_instance_of", [](Node* node) { return node->getInstanceOf(); })
-        .def("set_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
-        .def("change_instance_of", [](Node* node, char const* _path){ node->changeInstanceOf(_path);})
-        .def("reset_instance_of", [](Node* node, char const* _path){ node->resetInstanceOf(_path);})
-        .def("get_float", [](Node* node) { return node->getFloat(); })
-        .def("get_int", [](Node* node) { return node->getInt(); })
-        .def("get_string", [](Node* node) { return node->getString(); })
-        .def("get_bool", [](Node* node) { return node->getBool(); })
-        .def("get_entityref", &Node::getEntityRef)
-        .def("get_raw_float", &Node::getRawFloat)
-        .def("get_raw_int", &Node::getRawInt)
-        .def("get_raw_string", &Node::getRawString)
-        .def("get_raw_bool", &Node::getRawBool)
-        .def("get_default_float", [](Node* node) { return node->getDefaultFloat(); })
-        .def("get_default_int", [](Node* node) { return node->getDefaultInt(); })
-        .def("get_default_string", [](Node* node) { return node->getDefaultString(); })
-        .def("get_default_bool", [](Node* node) { return node->getDefaultBool(); })
-        .def("is_default", [](Node* node) { return node->isDefault(); })
-        .def("get_type_name", [](Node* node) { return node->getTypeName(); })
-        // properties are reference_internal by default, but "value" is a fake property since
-        // the Node doesn't own the returned variant.
-        .def_property("value", getValue, setValue, py::return_value_policy::copy)
-        .def_property_readonly("default_value", getDefaultValue)
-        .def("set_float", [](Node* node, double val) { return node->setFloat(val); })
-        .def("set_int", [](Node* node, int64_t val) { return node->setInt(val); })
-        .def("set_string", [](Node* node, char const* str) { return node->setString(str); })
-        .def("set_bool", [](Node* node, bool val) { return node->setBool(val); })
-        .def("set_entityref", &Node::setEntityRef)
-        .def(
-            "get_union_data",
-            [](Node* node) { return node->getUnionData(); },
-            py::return_value_policy::reference_internal)
-        .def_property_readonly("union_data", [](Node* node) { return node->getUnionData(); }, py::return_value_policy::reference_internal)
-        .def("get_union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
-        .def_property_readonly("union_type", &Node::getUnionType, py::return_value_policy::reference_internal)
-        .def("set_union_type", &Node::setUnionType, py::return_value_policy::reference_internal)
-        .def(
-            "get_schema",
-            [](Node* node) { return node->getSchema(); },
-            py::return_value_policy::reference_internal)
-        .def_property_readonly(
-            "schema",
-            [](Node* node) { return node->getSchema(); },
-            py::return_value_policy::reference_internal)
-        .def("unset", [](Node* node) { return node->unset(); })
-        .def("is_set", [](Node* node) { return node->isSet(); })
-        .def("dumps", [](Node* node, OverrideValueSource source, bool superKeyIsType)
-             {
-                 return node->toJson(source, superKeyIsType).dump(4);
-             },
-             "source"_a = OverrideValueSource::Override, "superKeyIsType"_a = false)
-        .def("map_erase", static_cast<bool(Node::*)(char const*) const>(&Node::mapErase))
-        .def("map_erase", [](Node* _node, String const& _key){ return _node->mapErase(_key.c_str()); })
-        .def("map_erase", static_cast<bool(Node::*)(int64_t) const>(&Node::mapErase))
-        .def("map_rename", static_cast<Node*(Node::*)(char const*, char const*)>(&Node::mapRename), py::return_value_policy::reference_internal)
-        .def("map_rename", [](Node* _node, String const& _from, String const& _to)
-            {
-                return _node->mapRename(_from.c_str(), _to.c_str());
-            }, py::return_value_policy::reference_internal)
-        .def("map_rename", static_cast<Node*(Node::*)(int64_t, int64_t) const>(&Node::mapRename), py::return_value_policy::reference_internal)
-        .def("map_get", static_cast<Node*(Node::*)(char const*)>(&Node::mapGet), py::return_value_policy::reference_internal)
-        .def("map_get", [](Node* node, String const& str){return node->mapGet(str.c_str());}, py::return_value_policy::reference_internal)
-        .def("map_get", static_cast<Node*(Node::*)(int64_t)>(&Node::mapGet), py::return_value_policy::reference_internal)
-        .def("map_insert", static_cast<Node*(Node::*)(char const*) const>(&Node::mapInsert), py::return_value_policy::reference_internal)
-        .def("map_insert", [](Node* _node, String const& _key){ return _node->mapInsert(_key.c_str()); }, py::return_value_policy::reference_internal)
-        .def("map_insert", static_cast<Node*(Node::*)(int64_t)>(&Node::mapInsert), py::return_value_policy::reference_internal)
-        .def("map_insert_instanceof", &Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
-        .def("map_insert_instanceof", (Node* (Node::*)(int64_t))&Node::mapInsertInstanceOf, py::return_value_policy::reference_internal)
-        .def("is_map_or_set", &Node::isMapOrSet)
-        .def("get_key_type", &Node::getKeyType)
-        .def("get_keys", nodeGetKey)
-        .def("save_node", &Node::saveNode)
-        .def("detach", &Node::detach)
-        .def("make_instance_of", &Node::makeInstanceOf)
-        .def_property_readonly("parent_node", static_cast<Node*(Node::*)()>(&Node::getParentNode), py::return_value_policy::reference_internal)
-        .def("apply_all_values", [](Node& self, Node& dest, CopyMode copyMode) {
-            self.applyAllValues(dest, copyMode);
-        })
-        .def_property_readonly("root_node", &Node::getRootNode, py::return_value_policy::reference_internal)
-        .def("make_noderef", &Node::makeNodeRef)
-        .def("resolve_noderef", static_cast<Node*(Node::*)(char const* _nodeRef)>(&Node::resolveNodeRef), py::return_value_policy::reference_internal)
-        .def_property_readonly("absolute_noderef", &Node::makeAbsoluteNodeRef)
-        .def("get_prefab_history", &Node::getPrefabHistory)
-        .def("apply_to_prefab", &Node::applyToPrefab)
         ;
 
     pyComponentsSchema
@@ -676,11 +458,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
-        .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Node const&, Node const&) const>(&EntityLib::makeEntityRef))
         .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Property const&, Property const&) const>(&EntityLib::makeEntityRef))
-        .def("resolve_entityref",
-            static_cast<Node*(EntityLib::*)(Node*, EntityRef const&) const>(&EntityLib::resolveEntityRef),
-            py::return_value_policy::reference_internal)
         .def("resolve_entityref",
             static_cast<std::optional<Property>(EntityLib::*)(Property const&, EntityRef const&) const>(&EntityLib::resolveEntityRef),
             py::keep_alive<0, 1>())
@@ -692,17 +470,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "component_incompatibilities",
             &EntityLib::componentIncompatibilities,
             py::return_value_policy::reference_internal)
-        .def(
-            "load_node_read_only",
-            [](EntityLib* entlib, Subschema const* schema, char const* name){ return entlib->loadNodeReadOnly(*schema, name).get();},
-            py::return_value_policy::reference_internal
-        )
-        .def(
-            "load_node_entity_read_only",
-            [](EntityLib* entlib, char const* name){ return entlib->loadNodeEntityReadOnly(name).get();},
-            py::return_value_policy::reference_internal
-        )
-        .def("get_node_cache", &EntityLib::getNodeCache, py::return_value_policy::reference_internal)
         .def("get_json_database", [](EntityLib const& _entlib)
         {
             std::map<std::string, nlohmann::json*> allFiles;
@@ -713,30 +480,10 @@ PYBIND11_MODULE(EntityLibPy, ent)
             }
             return allFiles;
         })
-        .def("clear_cache", &EntityLib::clearCache)
-        .def("load_node_file",
-            [](EntityLib* lib, std::filesystem::path const& _path, Subschema const& _schema)
-            {
-                return lib->loadFileAsNode(_path, _schema);
-            }, py::keep_alive<0, 1>())
-        .def("load_node_file",
-            [](EntityLib* lib, char const* _path)
-            {
-                return lib->loadFileAsNode(_path);
-            }, py::keep_alive<0, 1>())
-        .def("load_node_entity", &EntityLib::loadEntityAsNode, py::keep_alive<0, 1>())
         .def_property(
             "logic_error_policy",
             [](EntityLib* lib){return lib->getLogicErrorPolicy();},
             [](EntityLib* lib, LogicErrorPolicy err){lib->setLogicErrorPolicy(err);})
-        .def("load_node_scene", &EntityLib::loadSceneAsNode, py::keep_alive<0, 1>()) // py::keep_alive<0, 1> => Do not destroy EntityLib before Node
-        .def("make_node_instanceof", &EntityLib::makeNodeInstanceOf, py::keep_alive<0, 1>())
-        .def("make_entity_node_instanceof", &EntityLib::makeEntityNodeInstanceOf, py::keep_alive<0, 1>())
-        .def("make_node", &EntityLib::makeNode, py::keep_alive<0, 1>())
-        .def("make_entity_node", &EntityLib::makeEntityNode, py::keep_alive<0, 1>())
-        .def("save_node_as_entity", &EntityLib::saveNodeAsEntity)
-        .def("save_node_as_scene", &EntityLib::saveNodeAsScene)
-        .def("get_parent_entity", static_cast<Node*(EntityLib::*)(Node*) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
         .def("get_parent_entity", static_cast<std::optional<Property>(EntityLib::*)(Property const&) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def("load_property", (Property (EntityLib::*)(char const*, char const*))&EntityLib::loadProperty, "schema_name"_a, "file_path"_a)
@@ -754,13 +501,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("__str__", [](EntityRef* ref) { return static_cast<std::string>(ref->entityPath); })
         .def("__eq__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath == _rhs.entityPath; })
         .def("__lt__", [](EntityRef const& _lhs, EntityRef const& _rhs){ return _lhs.entityPath < _rhs.entityPath; });
-
-    pyNodeFile
-        .def_property_readonly(
-            "data",
-            [](EntityLib::NodeFile* entF) { return entF->data.get(); },
-            py::return_value_policy::reference_internal)
-        .def_readonly("time", &EntityLib::NodeFile::time, py::return_value_policy::reference_internal);
 
     pyProperty
         .def(py::init<EntityLib*, Subschema const*, char const*>(), py::keep_alive<1, 2>())

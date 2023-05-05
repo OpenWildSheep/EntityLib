@@ -538,17 +538,6 @@ namespace Ent
 #define ENT_IF_COMPILE(TYPE, PARAM, CODE)                                                          \
     if constexpr (Ent::doesCompile<TYPE>([](auto && (PARAM)) -> decltype(CODE) {}))
 
-    struct Node;
-    struct NodeDeleter
-    {
-        template <typename T>
-        void operator()(T* ptr) const
-        {
-            destroyAndFree(ptr);
-        }
-    };
-    using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
-
     /// @brief Path to found a Node, from an other Node.
     ///
     /// Token are separated by slashes.
@@ -595,5 +584,16 @@ namespace Ent
         OverrideOrPrefab,
         /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
         Any,
+    };
+
+    /// @brief Value location inside an \e Override<T>
+    enum class OverrideValueLocation
+    {
+        /// Override value comes from default value.
+        Default,
+        /// Override value comes from the prefab.
+        Prefab,
+        /// Override value comes from the instance.
+        Override
     };
 } // namespace Ent

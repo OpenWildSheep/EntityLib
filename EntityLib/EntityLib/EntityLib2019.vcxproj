@@ -114,7 +114,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Array.cpp" />
     <ClCompile Include="ComponentMerge.cpp" />
     <ClCompile Include="EntityLib.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableAllWarnings</WarningLevel>
@@ -125,20 +124,14 @@
     <ClCompile Include="EntityLibCore.cpp" />
     <ClCompile Include="FileProperty.cpp" />
     <ClCompile Include="Schema.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="Node.cpp" />
-    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Property.cpp" />
     <ClCompile Include="PropImpl.cpp" />
     <ClCompile Include="SchemaLoader.cpp" />
     <ClCompile Include="Tools.cpp" />
-    <ClCompile Include="Union.cpp" />
     <ClCompile Include="ValidJson.cpp" />
-    <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Visitor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Array.h" />
     <ClInclude Include="include\ComponentMerge.h" />
     <ClInclude Include="include\EntityLib.h" />
     <ClInclude Include="include\EntityLibCore.h" />
@@ -149,18 +142,11 @@
     <ClInclude Include="include\EntityLib\SearchProperty.h" />
     <ClInclude Include="include\EntityLib\Visitor.h" />
     <ClInclude Include="include\Schema.h" />
-    <ClInclude Include="Map.h" />
     <ClInclude Include="MemoryProfiler.h" />
-    <ClInclude Include="Node.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="Override.h" />
     <ClInclude Include="PropImpl.h" />
-    <ClInclude Include="RemovableMap.h" />
     <ClInclude Include="SchemaLoader.h" />
     <ClInclude Include="Tools.h" />
-    <ClInclude Include="Union.h" />
     <ClInclude Include="ValidJson.h" />
-    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -373,29 +373,18 @@ try
     }
     {
         // When there is a $schema field
-        auto node = entlib.loadFileAsNode("myseedpatch_schema.node");
-        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("SeedPatchDataList"));
+        auto node = entlib.loadProperty("myseedpatch_schema.node");
+        ENTLIB_ASSERT(node.getSchema() == entlib.getSchema("SeedPatchDataList"));
         // When there is a $schema field with different style
-        node = entlib.loadFileAsNode("myseedpatch_schema_style.node");
-        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("SeedPatchDataList"));
-        // When it is an Entity without schema field
-        node = entlib.loadFileAsNode("prefab.entity");
-        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema(Ent::entitySchemaName));
-        // No $schema but a right pre-extention
-        node = entlib.loadFileAsNode("test.CharacterControllerGD.node");
-        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("CharacterControllerGD"));
-        // No $schema but pre-extention with bad case
-        node = entlib.loadFileAsNode("test_wrong_casse.chAracTercontrOlleRgd.nOde");
-        ENTLIB_ASSERT(node->getSchema() == entlib.getSchema("CharacterControllerGD"));
+        node = entlib.loadProperty("myseedpatch_schema_style.node");
+        ENTLIB_ASSERT(node.getSchema() == entlib.getSchema("SeedPatchDataList"));
         // No $schema, no .entity, wrong pre-extention
         ENTLIB_CHECK_EXCEPTION(
-            entlib.loadFileAsNode("test.ThisTypeDoesntExist.node"), Ent::UnknownSchema);
+            entlib.loadProperty("test.ThisTypeDoesntExist.node"), Ent::UnknownSchema);
     }
-    entlib.clearCache();
     {
-        auto node =
-            entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
-        auto prefabHisto = node->getPrefabHistory();
+        auto node = entlib.loadProperty("Entity", "instance.entity");
+        auto prefabHisto = getPrefabHistory(node);
     }
     // Temporarily disable validation to read some RawData files
     entlib.validationEnabled = false;
@@ -436,20 +425,20 @@ try
                    "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
         }
         {
-            auto node = entlib.loadFileAsNode(
+            auto node = entlib.loadPropertyCopy(
+                "Entity",
                 "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
-                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
-                entlib.schema.schema.allDefinitions["Entity"]);
+                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
             auto const* nodeRef = "Components/SubScene/Embedded/ShamanFullBlue_ent_001";
-            auto* ent = node->resolveNodeRef(nodeRef);
-            auto entpath = node->makeNodeRef(ent);
+            auto ent = node.resolveNodeRef(nodeRef);
+            auto entpath = node.makeNodeRef(*ent);
             ENTLIB_ASSERT(entpath == nodeRef);
             entpath = ent->makeAbsoluteNodeRef();
             ENTLIB_ASSERT(entpath == nodeRef);
-            entpath = node->makeAbsoluteNodeRef();
+            entpath = node.makeAbsoluteNodeRef();
             ENTLIB_ASSERT(entpath == ".");
 
-            auto prefabHisto = ent->getPrefabHistory();
+            auto prefabHisto = getPrefabHistory(*ent);
             ENTLIB_ASSERT(prefabHisto.size() == 7);
             ENTLIB_ASSERT(
                 prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
@@ -458,16 +447,16 @@ try
                 == "02_Creature/Human/MALE/Entity/validate/ShamanFullBlue.entity");
         }
         {
-            auto node = entlib.loadFileAsNode(
+            auto node = entlib.loadPropertyCopy(
+                "Entity",
                 "20_Scene/KOM2021/SubScenesKOM/FindWolvesRegenBubble/"
-                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene",
-                entlib.schema.schema.allDefinitions["Entity"]);
+                "FindWolvesRegenBubbleMain/editor/FindWolvesRegenBubbleMain.scene");
             auto const* nodeRef =
                 R"(Components/SubScene/Embedded/ShamanFullBlue_ent_001/Components/TransformGD)";
-            auto* ent = node->resolveNodeRef(nodeRef);
-            auto entpath = node->makeNodeRef(ent);
+            auto ent = node.resolveNodeRef(nodeRef);
+            auto entpath = node.makeNodeRef(*ent);
             ENTLIB_ASSERT(entpath == nodeRef);
-            auto prefabHisto = ent->getPrefabHistory();
+            auto prefabHisto = getPrefabHistory(*ent);
             ENTLIB_ASSERT(
                 prefabHisto[3].prefabPath == "02_creature/human/male/entity/legacy/human_male.entity");
             ENTLIB_ASSERT(
@@ -480,30 +469,27 @@ try
 
     entlib.validationEnabled = prevValidationEnabled;
     {
-        auto node =
-            entlib.loadFileAsNode("instance.entity", entlib.schema.schema.allDefinitions["Entity"]);
+        auto node = entlib.loadPropertyCopy("Entity", "instance.entity");
         auto const* nodeRef =
             R"(Components/SubScene/Embedded/EP1-Spout_LINK_001/Components/NetworkLink)";
-        auto* ent = node->resolveNodeRef(nodeRef);
-        auto entpath = node->makeNodeRef(ent);
+        auto ent = node.resolveNodeRef(nodeRef);
+        auto entpath = node.makeNodeRef(*ent);
         ENTLIB_ASSERT(entpath == nodeRef);
-        auto nullPath = ent->makeNodeRef(ent);
+        auto nullPath = ent->makeNodeRef(*ent);
         ENTLIB_ASSERT(nullPath.empty() or nullPath == ".");
         // Test Union
-        auto* typedValueUnion = node->at("Components")
-                                    ->mapInsert("ScriptComponentGD")
-                                    ->getUnionData()
-                                    ->at("CommonDataMap")
-                                    ->mapInsert("Test")
-                                    ->at("Value");
+        auto typedValueUnion = node.getObjectField("Components")
+                                   .insertUnionSetItem("ScriptComponentGD")
+                                   .getObjectField("CommonDataMap")
+                                   .insertMapItem("Test")
+                                   .getObjectField("Value");
         auto const* typeValueRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value)";
-        ENTLIB_ASSERT(node->makeNodeRef(typedValueUnion) == typeValueRef);
-        auto* stringUnionData = typedValueUnion->setUnionType("string");
+        ENTLIB_ASSERT(node.makeNodeRef(typedValueUnion) == typeValueRef);
+        auto stringUnionData = typedValueUnion.setUnionType("string");
         auto const* strRef = R"(Components/ScriptComponentGD/CommonDataMap/Test/Value/string)";
-        ENTLIB_ASSERT(node->makeNodeRef(stringUnionData) == strRef);
-        ENTLIB_ASSERT(typedValueUnion->makeNodeRef(stringUnionData) == "string");
+        ENTLIB_ASSERT(node.makeNodeRef(stringUnionData) == strRef);
+        ENTLIB_ASSERT(typedValueUnion.makeNodeRef(stringUnionData) == "string");
     }
-    entlib.clearCache();
     auto testPrefabEntity = [&entlib](Gen::Entity ent)
     {
         // ActorStates

@@ -165,237 +165,6 @@ public:
     }
 };
 
-class CompareNode : public RecursiveVisitor
-{
-    std::vector<Node*> nodes;
-
-public:
-    explicit CompareNode(Node* n)
-        : nodes({n})
-    {
-    }
-    void inObject([[maybe_unused]] Property const& _prop) override
-    {
-        // ENTLIB_ASSERT(nodes.back()->getFieldNames().size() == expl.get);
-    }
-    bool inObjectField([[maybe_unused]] Property const& _prop, char const* key) override
-    {
-        nodes.push_back(nodes.back()->at(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-        return true;
-    }
-    void outObjectField([[maybe_unused]] Property const& _prop, [[maybe_unused]] char const* _key) override
-    {
-        nodes.pop_back();
-    }
-    void outObject([[maybe_unused]] Property const& _prop) override
-    {
-    }
-    void inUnion([[maybe_unused]] Property const& _prop, [[maybe_unused]] char const* _type) override
-    {
-        //ENTLIB_ASSERT(strcmp(expl.getUnionType(), nodes.back()->getUnionType()) == 0);
-        //ENTLIB_ASSERT(strcmp(nodes.back()->getUnionType(), type) == 0);
-        nodes.push_back(nodes.back()->getUnionData());
-        // expl.getUnionData();
-        // std::cout << "expl : UnionData : " << expl.getSchema()->name << std::endl;
-        // std::cout << "inUnion : UnionData : " << nodes.back()->getSchema()->name << std::endl;
-        //if (expl.getSchema()->name != nodes.back()->getSchema()->name)
-        //{
-        //    expl.exit();
-        //    expl.getUnionData();
-        //}
-        //expl.exit();
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void outUnion([[maybe_unused]] Property const& _prop) override
-    {
-        nodes.pop_back();
-    }
-    void inMap(Property const& expl) override
-    {
-        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-        switch (expl.getMapKeyType())
-        {
-        case DataType::entityRef: [[fallthrough]];
-        case DataType::string:
-            if (nodes.back()->getKeysString().size() != expl.getMapKeysString().size())
-            {
-                std::cout << nodes.back()->getKeysString().size() << " "
-                          << expl.getMapKeysString().size() << std::endl;
-            }
-            ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getMapKeysString().size());
-            break;
-        case DataType::integer:
-            ENTLIB_ASSERT(nodes.back()->getKeysInt().size() == expl.getMapKeysInt().size());
-
-            break;
-        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-        }
-    }
-    void outMap([[maybe_unused]] Property const& _prop) override
-    {
-    }
-    void inMapElement([[maybe_unused]] Property const& _prop, char const* key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void inMapElement([[maybe_unused]] Property const& _prop, int64_t key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void outMapElement([[maybe_unused]] Property const& _prop) override
-    {
-        nodes.pop_back();
-    }
-    void inPrimSet(Property const& expl, [[maybe_unused]] DataType _dataType) override
-    {
-        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-        auto const& itemType = expl.getSchema()->singularItems->get();
-        switch (itemType.type)
-        {
-        case DataType::entityRef: [[fallthrough]];
-        case DataType::string:
-            ENTLIB_ASSERT(nodes.back()->getKeysString().size() == expl.getPrimSetKeysString().size());
-            break;
-        case DataType::integer:
-            ENTLIB_ASSERT(nodes.back()->getKeysInt().size() == expl.getPrimSetKeysInt().size());
-            break;
-        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-        }
-    }
-    void inArrayElement([[maybe_unused]] Property const& _prop, size_t i) override
-    {
-        nodes.push_back(nodes.back()->at(i));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void outArrayElement([[maybe_unused]] Property const& _prop) override
-    {
-        nodes.pop_back();
-    }
-    void key([[maybe_unused]] Property const& _prop, char const* key) override
-    {
-        ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
-    }
-    void key([[maybe_unused]] Property const& _prop, int64_t key) override
-    {
-        ENTLIB_ASSERT(nodes.back()->mapGet(key) != nullptr);
-    }
-    void outPrimSet([[maybe_unused]] Property const& _prop) override
-    {
-    }
-    void inUnionSet(Property const& expl) override
-    {
-        auto const a = nodes.back()->getKeysString();
-        auto const b = expl.getUnionSetKeysString();
-        ENTLIB_ASSERT(a.size() == b.size());
-        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-        ENTLIB_ASSERT(nodes.back()->getSchema() == expl.getSchema());
-    }
-    void inUnionSetElement([[maybe_unused]] Property const& _prop, char const* type) override
-    {
-        auto* const union_ = nodes.back()->mapGet(type);
-        ENTLIB_ASSERT(union_ != nullptr);
-        nodes.push_back(union_->getUnionData());
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void outUnionSetElement([[maybe_unused]] Property const& _prop) override
-    {
-        nodes.pop_back();
-    }
-    void outUnionSet([[maybe_unused]] Property const& _prop) override
-    {
-    }
-    void inObjectSet(Property const& expl) override
-    {
-        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-        switch (nodes.back()->getKeyType())
-        {
-        case DataType::entityRef: [[fallthrough]];
-        case DataType::string:
-            ENTLIB_ASSERT(
-                nodes.back()->getKeysString().size() == expl.getObjectSetKeysString().size());
-            break;
-        case DataType::integer:
-            ENTLIB_ASSERT(nodes.back()->getKeysInt().size() == expl.getObjectSetKeysInt().size());
-
-            break;
-        default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-        }
-    }
-    void outObjectSet([[maybe_unused]] Property const& _prop) override
-    {
-    }
-    void inObjectSetElement([[maybe_unused]] Property const& _prop, char const* key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void inObjectSetElement([[maybe_unused]] Property const& _prop, int64_t key) override
-    {
-        nodes.push_back(nodes.back()->mapGet(key));
-        ENTLIB_ASSERT(nodes.back() != nullptr);
-    }
-    void outObjectSetElement([[maybe_unused]] Property const& _prop) override
-    {
-        nodes.pop_back();
-    }
-    void inArray(Property const& expl) override
-    {
-        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-        if (nodes.back()->size() != expl.size())
-        {
-            [[maybe_unused]] auto size = expl.size();
-        }
-        ENTLIB_ASSERT(nodes.back()->size() == expl.size());
-    }
-    void outArray([[maybe_unused]] Property const& _prop) override
-    {
-    }
-    void nullProperty([[maybe_unused]] Property const& _prop) override
-    {
-    }
-    void boolProperty(Property const& expl) override
-    {
-        // std::cout << elt.getBool() << " " << nodes.back()->getBool() << std::endl;
-        ENTLIB_ASSERT(expl.getBool() == nodes.back()->getBool());
-    }
-    void intProperty(Property const& expl) override
-    {
-        if (expl.getInt() != nodes.back()->getInt())
-        {
-            std::cout << expl.getInt() << " " << nodes.back()->getInt() << std::endl;
-            [[maybe_unused]] auto val = expl.getInt();
-        }
-        ENTLIB_ASSERT(expl.getInt() == nodes.back()->getInt());
-    }
-    void floatProperty(Property const& expl) override
-    {
-        // std::cout << elt.getFloat() << " " << nodes.back().getFloat() << std::endl;
-        if (fabs(expl.getFloat() - nodes.back()->getFloat()) >= FLT_EPSILON)
-        {
-            [[maybe_unused]] auto val = expl.getFloat();
-        }
-        // ENTLIB_ASSERT(fabs(elt.getFloat() - nodes.back().getFloat()) < FLT_EPSILON);
-    }
-    void stringProperty(Property const& expl) override
-    {
-        if (strcmp(expl.getString(), nodes.back()->getString()) != 0)
-        {
-            std::cout << expl.getString() << " " << nodes.back()->getString() << std::endl;
-            [[maybe_unused]] auto const* val = expl.getString();
-        }
-        ENTLIB_ASSERT(strcmp(expl.getString(), nodes.back()->getString()) == 0);
-    }
-    void entityRefProperty(Property const& expl) override
-    {
-        //std::cout << elt.getEntityRef().entityPath.c_str() << " "
-        //          << nodes.back()->getEntityRef().entityPath.c_str() << std::endl;
-        ENTLIB_ASSERT(expl.getEntityRef() == nodes.back()->getEntityRef());
-    }
-};
-
 class CompareCursor : public RecursiveVisitor
 {
     Property expl2;
@@ -675,111 +444,6 @@ public:
     }
 };
 
-size_t countNodes(Node* node)
-{
-    size_t nodeCount = 0;
-    switch (node->getDataType())
-    {
-    case DataType::null: ++nodeCount; break;
-    case DataType::string: ++nodeCount; break;
-    case DataType::number: ++nodeCount; break;
-    case DataType::integer: ++nodeCount; break;
-    case DataType::object:
-        for (auto&& [name, prop] : node->getSchema()->properties)
-        {
-            nodeCount += countNodes(node->at(name.c_str()));
-        }
-        break;
-    case DataType::array:
-    {
-        auto meta = std::get<Subschema::ArrayMeta>(node->getSchema()->meta);
-        switch (hash(meta.overridePolicy))
-        {
-        case "map"_hash:
-            switch (node->getKeyType())
-            {
-            case DataType::entityRef: [[fallthrough]];
-            case DataType::string:
-                for (auto&& key : node->getKeysString())
-                {
-                    nodeCount += countNodes(node->mapGet(key.c_str()));
-                }
-                break;
-            case DataType::integer:
-                for (int64_t const key : node->getKeysInt())
-                {
-                    nodeCount += countNodes(node->mapGet(key));
-                }
-                break;
-            default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-            }
-            break;
-        case "set"_hash:
-        {
-            auto& itemType = node->getSchema()->singularItems->get();
-            switch (itemType.type)
-            {
-            case DataType::integer:
-                for (int64_t const key : node->getKeysInt())
-                {
-                    nodeCount += countNodes(node->mapGet(key));
-                }
-                break;
-            case DataType::entityRef: [[fallthrough]];
-            case DataType::string:
-                for (auto&& key : node->getKeysString())
-                {
-                    nodeCount += countNodes(node->mapGet(key.c_str()));
-                }
-                break;
-            case DataType::oneOf:
-                for (auto&& type : node->getKeysString())
-                {
-                    nodeCount += countNodes(node->mapGet(type.c_str())->getUnionData());
-                }
-                break;
-            case DataType::object:
-                auto const& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
-                switch (keyFieldSchema.type)
-                {
-                case DataType::entityRef: [[fallthrough]];
-                case DataType::string:
-                    for (auto&& key : node->getKeysString())
-                    {
-                        nodeCount += countNodes(node->mapGet(key.c_str()));
-                    }
-                    break;
-                case DataType::integer:
-                    for (auto&& key : node->getKeysInt())
-                    {
-                        nodeCount += countNodes(node->mapGet(key));
-                    }
-                    break;
-                default: ENTLIB_LOGIC_ERROR("Unexpected key type");
-                }
-                break;
-            }
-        }
-        break;
-        case ""_hash:
-            auto const size = node->size();
-            for (size_t i = 0; i < size; ++i)
-            {
-                nodeCount += countNodes(node->at(i));
-            }
-            break;
-        }
-    }
-    break;
-    case DataType::boolean: ++nodeCount; break;
-    case DataType::entityRef: ++nodeCount; break;
-    case DataType::oneOf: nodeCount += countNodes(node->getUnionData()); break;
-    case DataType::COUNT:
-    default: ENTLIB_LOGIC_ERROR("Unexpected datatype");
-    }
-    return nodeCount;
-}
-
 void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, bool doTestRawData)
 {
     {
@@ -916,19 +580,7 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
     }
     {
         std::cout << "Read instance.entity with LazyLib" << std::endl;
-        clock_t start = clock();
         Property expl(&entlib, entlib.getSchema(entitySchemaName), "instance.entity");
-        clock_t end = clock();
-
-        auto ent = entlib.loadEntityAsNode(R"(instance.entity)");
-
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
-        CompareNode compare(ent.get());
-        std::cout << "Visit all" << std::endl;
-        start = clock();
-        visitRecursive(expl, compare);
-        end = clock();
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
 
         nlohmann::json newDoc = nlohmann::json::object();
         Property destExpl(&entlib, expl.getSchema(), "", &newDoc, nullptr);
@@ -942,7 +594,6 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
         SearchProperty searcher(pattern);
         visitRecursive(expl, searcher);
         auto matching = searcher.getMatchingProperties();
-        end = clock();
         ENTLIB_ASSERT(matching.size() == 1);
     }
     bool testLoading = doTestRawData;
@@ -987,27 +638,12 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
             std::filesystem::path savePath =
                 std::filesystem::current_path() / "test_output/WhistlingPlainsFPMain.scene";
             entlib.saveJsonFile(
-                &newDoc, savePath.generic_string().c_str(),
-                expl.getSchema()->name.c_str());
+                &newDoc, savePath.generic_string().c_str(), expl.getSchema()->name.c_str());
 
             std::cout << "CompareCursor WhistlingPlainsFPMain.scene wth the clone" << std::endl;
             CompareCursor comparator(destExpl);
             visitRecursive(expl, comparator);
         }
-
-        std::cout << "Read WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
-        start = clock();
-        auto ent = entlib.loadEntityAsNode(
-            R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
-        end = clock();
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
-
-        std::cout << "Travserse WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
-        start = clock();
-        auto nodeCount = countNodes(ent.get());
-        end = clock();
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
-        std::cout << "Primitive count : " << nodeCount << std::endl;
 
         PrimitiveCounterVisitor visitor;
         std::cout << "Travserse WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
@@ -1016,39 +652,5 @@ void testCursor(EntityLib& entlib, std::filesystem::path const& rawdataPath, boo
         end = clock();
         std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
         std::cout << "Primitive count : " << visitor.primitiveCount << std::endl;
-    }
-    bool testCompare = doTestRawData;
-    if (testCompare)
-    {
-        entlib.rawdataPath = rawdataPath;
-        std::cout << "Read WhistlingPlainsFPMain.scene with LazyLib" << std::endl;
-        clock_t start = clock();
-        Property expl(
-            &entlib,
-            entlib.getSchema(entitySchemaName),
-            R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
-        clock_t end = clock();
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
-
-        std::cout << "Read WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
-        start = clock();
-        auto ent = entlib.loadEntityAsNode(
-            R"(20_Scene/FP2021/NewLayoutFPSubscenes/WhistlingPlainsFPMain/editor/WhistlingPlainsFPMain.scene)");
-        end = clock();
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
-
-        std::cout << "Travserse WhistlingPlainsFPMain.scene with NodeLib" << std::endl;
-        start = clock();
-        auto nodeCount = countNodes(ent.get());
-        end = clock();
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
-        std::cout << "Primitive count : " << nodeCount << std::endl;
-
-        std::cout << "Compare both" << std::endl;
-        start = clock();
-        CompareNode comparator(ent.get());
-        visitRecursive(expl, comparator);
-        end = clock();
-        std::cout << static_cast<float>(end - start) / CLOCKS_PER_SEC << std::endl;
     }
 }

@@ -538,17 +538,6 @@ namespace Ent
 #define ENT_IF_COMPILE(TYPE, PARAM, CODE)                                                          \
     if constexpr (Ent::doesCompile<TYPE>([](auto && (PARAM)) -> decltype(CODE) {}))
 
-    struct Node;
-    struct NodeDeleter
-    {
-        template <typename T>
-        void operator()(T* ptr) const
-        {
-            destroyAndFree(ptr);
-        }
-    };
-    using NodeUniquePtr = std::unique_ptr<Node, NodeDeleter>;
-
     /// @brief Path to found a Node, from an other Node.
     ///
     /// Token are separated by slashes.

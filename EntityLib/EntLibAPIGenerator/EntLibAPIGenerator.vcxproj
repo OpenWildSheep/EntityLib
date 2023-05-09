@@ -116,9 +116,6 @@
     <ClCompile Include="EntLibAPIGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resources\cpp\EntGenHelpers.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\EntityLib\EntityLib2019.vcxproj">
       <Project>{69315629-1871-49b2-ae40-1c2337e5dca0}</Project>
     </ProjectReference>

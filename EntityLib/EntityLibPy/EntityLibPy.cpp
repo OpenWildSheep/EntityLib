@@ -253,7 +253,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyDataKind = py::enum_<DataKind>(ent, "DataKind");
     auto pyLogicErrorPolicy = py::enum_<LogicErrorPolicy>(ent, "LogicErrorPolicy");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
-    auto pyOverrideValueLocation = py::enum_<OverrideValueLocation>(ent, "OverrideValueLocation");
     auto pyCopyMode = py::enum_<CopyMode>(ent, "CopyMode");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
     auto pyEntString = py::class_<String>(ent, "String");
@@ -304,12 +303,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("Override", OverrideValueSource::Override)
         .value("OverrideOrPrefab", OverrideValueSource::OverrideOrPrefab)
         .value("Any", OverrideValueSource::Any)
-        .export_values();
-
-    pyOverrideValueLocation
-        .value("Default", OverrideValueLocation::Default)
-        .value("Prefab", OverrideValueLocation::Prefab)
-        .value("Override", OverrideValueLocation::Override)
         .export_values();
 
     pyCopyMode

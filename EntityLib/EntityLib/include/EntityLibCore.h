@@ -585,15 +585,4 @@ namespace Ent
         /// Value can be any source: Override, Prefab or the default value. Don't write the "InstaneOf" field.
         Any,
     };
-
-    /// @brief Value location inside an \e Override<T>
-    enum class OverrideValueLocation
-    {
-        /// Override value comes from default value.
-        Default,
-        /// Override value comes from the prefab.
-        Prefab,
-        /// Override value comes from the instance.
-        Override
-    };
 } // namespace Ent

@@ -149,7 +149,10 @@ namespace Ent
         VersionedJson& readJsonFile(char const* _filepath) const;
         VersionedJson& createTempJsonFile(char const* _schemaName) const;
         void saveJsonFile(nlohmann::json const* doc, char const* _filepath, char const* _schema) const;
+
+        // Warning : this function changes the current directory temporarily and restores it at the end of the function
         void saveJsonFileDatabase(char const* _customRootpath) const;
+
         std::vector<std::pair<std::filesystem::path, JSonFileState>> collectOutdatedJsonFiles() const;
         void reloadJsonFiles(std::vector<std::filesystem::path> const& _filePaths) const;
 

@@ -533,16 +533,23 @@ namespace Ent
 
     void EntityLib::saveJsonFileDatabase(char const* _customRootpath) const
     {
+        // to handle situations where the absolute file paths are too long,
+        // we temporarily change the current directory to the root before saving entities using relative paths
+        std::filesystem::path const previousCurPath = std::filesystem::current_path();
+        if (_customRootpath != nullptr)
+        {
+            auto const absPath = getAbsolutePath(_customRootpath);
+            std::filesystem::current_path(absPath);
+        }
+        else
+        {
+            std::filesystem::current_path(rawdataPath);
+        }
+
         for (auto const& [path, versionedJson] : m_jsonDatabase)
         {
-            std::filesystem::path savePath = path;
-            if (_customRootpath != nullptr)
-            {
-                std::filesystem::path relPath = relative(savePath, rawdataPath);
-                savePath = _customRootpath / relPath;
-            }
-            auto const absPath = getAbsolutePath(savePath);
-            auto const tempFilename = std::filesystem::path(absPath.string() + ".tmp");
+            std::filesystem::path relPath = relative(path, rawdataPath);
+            auto const tempFilename = std::filesystem::path(relPath.string() + ".tmp");
             create_directories(tempFilename.parent_path());
             {
                 std::ofstream ofs(tempFilename);
@@ -553,8 +560,10 @@ namespace Ent
                 json copy = versionedJson->document;
                 ofs << copy.dump(4);
             }
-            try3Times([&] { rename(tempFilename, absPath); });
+            try3Times([&] { rename(tempFilename, relPath); });
         }
+
+        std::filesystem::current_path(previousCurPath);
     }
 
     std::vector<std::pair<std::filesystem::path, JSonFileState>> EntityLib::collectOutdatedJsonFiles() const

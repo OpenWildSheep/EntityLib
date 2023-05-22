@@ -58,7 +58,7 @@ namespace Ent
         {
             c = (c.native() + L'/');
         }
-        return std::filesystem::path(strToLower(c.make_preferred().generic_string()));
+        return c.make_preferred();
     }
 
     EntityLib::EntityLib(std::filesystem::path const& _rootPath, bool _doMergeComponents)
@@ -436,7 +436,8 @@ namespace Ent
     VersionedJson& EntityLib::readJsonFile(char const* _filepath) const
     {
         auto const absPath = getAbsolutePath(_filepath);
-        if (auto const iter = m_jsonDatabase.find(absPath); iter != m_jsonDatabase.end())
+        std::filesystem::path const absPathLower = strToLower(absPath.generic_string());
+        if (auto const iter = m_jsonDatabase.find(absPathLower); iter != m_jsonDatabase.end())
         {
             return *iter->second;
         }
@@ -456,7 +457,7 @@ namespace Ent
         {
             file->metadata.time = timestamp;
         }
-        return *m_jsonDatabase.emplace(absPath, std::move(file)).first->second;
+        return *m_jsonDatabase.emplace(absPathLower, std::move(file)).first->second;
     }
 
     VersionedJson& EntityLib::createTempJsonFile(char const* _schemaName) const
@@ -510,14 +511,15 @@ namespace Ent
             ofs << copy.dump(4);
         }
         try3Times([&] { rename(tempFilename, absPath); });
-        if (m_jsonDatabase.count(absPath) == 0)
+        std::filesystem::path const absPathLower = strToLower(absPath.generic_string());
+        if (m_jsonDatabase.count(absPathLower) == 0)
         {
-            m_jsonDatabase[absPath] = std::make_unique<VersionedJson>();
+            m_jsonDatabase[absPathLower] = std::make_unique<VersionedJson>();
         }
-        if (&(m_jsonDatabase[absPath]->document) != doc)
+        if (&(m_jsonDatabase[absPathLower]->document) != doc)
         {
-            m_jsonDatabase[absPath]->document = *doc;
-            ++m_jsonDatabase[absPath]->metadata.version;
+            m_jsonDatabase[absPathLower]->document = *doc;
+            ++m_jsonDatabase[absPathLower]->metadata.version;
             auto error = std::error_code{};
             auto const timestamp = last_write_time(absPath, error);
             if (error)
@@ -526,7 +528,7 @@ namespace Ent
             }
             else
             {
-                m_jsonDatabase[absPath]->metadata.time = timestamp;
+                m_jsonDatabase[absPathLower]->metadata.time = timestamp;
             }
         }
     }

@@ -181,14 +181,7 @@ try
 
     std::filesystem::path rawdataPath = rootPath / "RawData";
 
-    // Ent::updateComponents("X:/Tools");
-#ifdef _DEBUG
-    bool const doMergeComponents = false;
-#else
-    bool const doMergeComponents = true;
-#endif
-
-    EntityLib entlib(rootPath, doMergeComponents);
+    EntityLib entlib(rootPath);
     using namespace std::filesystem;
 
     entlib.setLogicErrorPolicy(LogicErrorPolicy::Throw);

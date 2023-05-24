@@ -61,7 +61,7 @@ namespace Ent
         return c.make_preferred();
     }
 
-    EntityLib::EntityLib(std::filesystem::path const& _rootPath, bool _doMergeComponents)
+    EntityLib::EntityLib(std::filesystem::path const& _rootPath)
         : rootPath(very_weakly_canonical(_rootPath)) // Read schema and dependencies
     {
         rawdataPath = getAbsolutePath(rootPath / "RawData");
@@ -69,13 +69,6 @@ namespace Ent
         auto schemaPath = toolsDir / "WildPipeline/Schema";
 
         SchemaLoader loader(toolsDir, schemaPath);
-
-        if (_doMergeComponents)
-        {
-            // mergeComponents create the content of the "MergedComponents.json" file
-            json mergedComps = mergeComponents(toolsDir);
-            loader.addInCache("MergedComponents.json", std::move(mergedComps));
-        }
 
         json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/MergedComponents.json");
 

@@ -1216,7 +1216,7 @@ try
     auto resourcePath = path(argv[1]);
     auto destinationPath = path(argv[2]);
 
-    Ent::EntityLib entlib(argv[3], true);
+    Ent::EntityLib entlib(argv[3]);
 
     // Add all first-level definitions in the dist
     for (auto& [defName, def] : entlib.schema.schema.allDefinitions)

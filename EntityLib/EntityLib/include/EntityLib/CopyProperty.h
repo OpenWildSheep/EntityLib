@@ -98,7 +98,8 @@ namespace Ent
             _pop();
             return false;
         }
-        void outObjectField([[maybe_unused]] Property const& m_source, [[maybe_unused]] char const* _key) override
+        void outObjectField(
+            [[maybe_unused]] Property const& m_source, [[maybe_unused]] char const* _key) override
         {
             _pop();
         }

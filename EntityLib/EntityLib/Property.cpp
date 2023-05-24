@@ -245,6 +245,7 @@ namespace Ent
             return staticFormat(
                 R"("%s" - "%s")", bestPrefabInfo->prefabPath.c_str(), bestPrefabInfo->nodeRef.c_str());
         }
-        return staticFormat(R"("%s" - "%s")", histories[0].prefabPath.c_str(), histories[0].nodeRef.c_str());
+        return staticFormat(
+            R"("%s" - "%s")", histories[0].prefabPath.c_str(), histories[0].nodeRef.c_str());
     }
 } // namespace Ent

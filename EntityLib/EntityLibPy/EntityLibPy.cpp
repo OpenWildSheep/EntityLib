@@ -227,6 +227,10 @@ nlohmann::json dumpProperty(Property _prop, bool _superKeyIsTypeName = false, bo
 
 std::vector<Property> searchChild(Property _prop, char const* _pattern)
 {
+    if (std::string_view(_pattern).empty())
+    {
+        return {};
+    }
     SearchProperty searcher(_pattern);
     visitRecursive(_prop, searcher);
     return searcher.getMatchingProperties();

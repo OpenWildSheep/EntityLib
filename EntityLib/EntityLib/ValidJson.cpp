@@ -245,9 +245,6 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         delete adapter; // NOLINT
     }
 
-    static char const* sceneSchemaPath = "WildPipeline/Schema/Scene-schema.json";
-    static char const* entitySchemaPath = "WildPipeline/Schema/Entity-schema.json";
-
     static std::string createMessageFromValidationResult(valijson::ValidationResults const& _result)
     {
         std::string fullMessage;
@@ -284,8 +281,6 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         // valid the scene using schema
         strcpy_s(
             schemaPath, sizeof(schemaPath), (_toolsDir / "WildPipeline/Schema").u8string().c_str());
-
-        json schemaDocument = loadJsonFile(_toolsDir, entitySchemaPath);
 
         json fullSceneInstanceSchema = createValidationSchema(_schema);
         fullSceneInstanceSchema["$ref"] = std::string("#/definitions/") + rootName;

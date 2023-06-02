@@ -14,9 +14,8 @@ using namespace nlohmann;
 namespace Ent
 {
 
-    SchemaLoader::SchemaLoader(std::filesystem::path _toolsdir, std::filesystem::path _schemaPath)
+    SchemaLoader::SchemaLoader(std::filesystem::path _schemaPath)
         : m_schemaPath(std::move(_schemaPath))
-        , m_toolsdir(std::move(_toolsdir))
     {
     }
 

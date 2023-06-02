@@ -1215,8 +1215,9 @@ try
     }
     auto resourcePath = path(argv[1]);
     auto destinationPath = path(argv[2]);
+    auto p4path = path(argv[3]);
 
-    Ent::EntityLib entlib(argv[3]);
+    Ent::EntityLib entlib(p4path / "RawData", p4path / "Tools/WildPipeline/Schema");
 
     // Add all first-level definitions in the dist
     for (auto& [defName, def] : entlib.schema.schema.allDefinitions)

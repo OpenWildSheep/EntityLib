@@ -64,7 +64,6 @@ namespace Ent
         /// @todo Make public attribute private?
         std::filesystem::path rootPath; ///< Path to the perforce root (X:/)
         std::filesystem::path rawdataPath; ///< Path to the RawData dir in the perforce root (X:/RawData)
-        std::filesystem::path toolsDir; ///< Path to the Tools dir in in the perforce root (X:/Tools)
         ComponentsSchema schema; ///< Schema of all components
         bool validationEnabled = false; ///< validate all objects at load/save
 
@@ -75,7 +74,8 @@ namespace Ent
         std::map<std::string, std::vector<std::string>> componentIncompatibilities;
 
         /// Load the EntityLib, given the path to the Tools directory
-        explicit EntityLib(std::filesystem::path const& _rootPath);
+        explicit EntityLib(
+            std::filesystem::path const& _rawdataPath, std::filesystem::path const& _schemaPath);
         ~EntityLib();
         /// @cond PRIVATE
         EntityLib(EntityLib const&) = delete;

@@ -181,7 +181,7 @@ try
 
     std::filesystem::path rawdataPath = rootPath / "RawData";
 
-    EntityLib entlib(rootPath);
+    EntityLib entlib(rawdataPath, rootPath / "Tools/WildPipeline/Schema");
     using namespace std::filesystem;
 
     entlib.setLogicErrorPolicy(LogicErrorPolicy::Throw);

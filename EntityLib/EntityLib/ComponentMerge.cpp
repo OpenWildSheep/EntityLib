@@ -225,7 +225,7 @@ namespace Ent
             }
         }
         // Write the "TextEditorsSchema.json" file. Containing all schema for all types.
-        EntityLib entlib(_toolsDir.parent_path());
+        EntityLib entlib(_toolsDir.parent_path() / "RawData", _toolsDir / "WildPipeline/Schema");
         json fullWildSchema = createValidationSchema(entlib.schema.schema);
         auto const fullWildSchemaLocation = _outputPath / "TextEditorsSchema.json";
         std::stringstream buffer;

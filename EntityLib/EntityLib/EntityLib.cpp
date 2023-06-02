@@ -61,16 +61,16 @@ namespace Ent
         return c.make_preferred();
     }
 
-    EntityLib::EntityLib(std::filesystem::path const& _rootPath)
-        : rootPath(very_weakly_canonical(_rootPath)) // Read schema and dependencies
+    EntityLib::EntityLib(
+        std::filesystem::path const& _rawdataPath, std::filesystem::path const& _schemaPath)
     {
-        rawdataPath = getAbsolutePath(rootPath / "RawData");
-        toolsDir = getAbsolutePath(rootPath / "Tools");
-        auto schemaPath = toolsDir / "WildPipeline/Schema";
+        rawdataPath = getAbsolutePath(_rawdataPath);
+        auto toolsDir = getAbsolutePath(rootPath / "Tools");
+        auto schemaPath = getAbsolutePath(_schemaPath);
 
-        SchemaLoader loader(toolsDir, schemaPath);
+        SchemaLoader loader(schemaPath);
 
-        json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/MergedComponents.json");
+        json schemaDocument = loadJsonFile("", schemaPath / "MergedComponents.json");
 
         loader.readSchema(&schema.schema, "MergedComponents.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
@@ -98,7 +98,7 @@ namespace Ent
         }
 
         static std::string const wildComponentNameSuffix = "GD";
-        json dependencies = loadJsonFile(toolsDir, "WildPipeline/Schema/Dependencies.json");
+        json dependencies = loadJsonFile("", schemaPath / "Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>() + wildComponentNameSuffix;
@@ -617,76 +617,6 @@ namespace Ent
     {
         UnsupportedFormat() = default;
     };
-
-    template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
-    std::shared_ptr<Type const> EntityLib::loadEntityOrScene(
-        std::filesystem::path const& _path,
-        Cache& cache,
-        ValidateFunc&& validate,
-        LoadFunc&& load,
-        Type const* _super) const
-    {
-        auto const absPath = getAbsolutePath(_path);
-        std::filesystem::path relPath = relative(absPath, rawdataPath);
-        if (relPath.empty() || (*relPath.begin() == ".."))
-        {
-            relPath = absPath;
-        }
-        bool reload = false;
-        auto error = std::error_code{};
-        auto timestamp = last_write_time(absPath, error);
-        if (error)
-        {
-            if (m_fallbackEntity.empty())
-            {
-                throw FileSystemError("Trying to get last write time", rawdataPath, relPath, error);
-            }
-            else
-            {
-                relPath = m_fallbackEntity.c_str();
-            }
-        }
-        auto iter = cache.find(relPath);
-        if (iter == cache.end())
-        {
-            reload = true;
-        }
-        else
-        {
-            if (timestamp > iter->second.time)
-            {
-                reload = true;
-            }
-        }
-
-        if (reload)
-        {
-            try
-            {
-                json document = loadJsonFile(rawdataPath, relPath);
-                if (validationEnabled)
-                {
-                    validate(schema.schema, toolsDir, document);
-                }
-
-                auto entity = load(*this, document, _super);
-                auto file = typename Cache::mapped_type{std::move(entity), timestamp};
-                auto [newiter, inserted] = cache.insert_or_assign(relPath, std::move(file));
-                return newiter->second.data;
-            }
-            catch (ContextException& ex)
-            {
-                ex.addContextMessage("loading : %s", formatPath(rawdataPath, relPath));
-                throw;
-            }
-            catch (...)
-            {
-                throw WrapperException(
-                    std::current_exception(), "loading : %s", formatPath(rawdataPath, relPath));
-            }
-        }
-        return iter->second.data;
-    }
 
     PropImplPtr EntityLib::newPropImpl()
     {

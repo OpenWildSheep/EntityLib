@@ -442,14 +442,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<uint8_t, uint8_t, uint8_t, uint8_t>());
 
     pyEntityLib
-        .def(py::init<std::string>())
+        .def(py::init<std::string, std::string>(), "rawdata_path"_a, "schemas_path"_a)
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](EntityLib* self) {return (intptr_t)self;})
         .def_static("from_ptr", [](intptr_t _ptr) {return (EntityLib*)_ptr;}, py::return_value_policy::reference_internal)
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
-        .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
         .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Property const&, Property const&) const>(&EntityLib::makeEntityRef))
         .def("resolve_entityref",

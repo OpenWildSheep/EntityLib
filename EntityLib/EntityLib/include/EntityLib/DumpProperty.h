@@ -94,7 +94,7 @@ namespace Ent
         {
             _Pop();
         }
-        void inPrimSet([[maybe_unused]] Property const& _prop, [[maybe_unused]] DataType _dataType) override
+        void inPrimSet([[maybe_unused]] Property const& _prop, [[maybe_unused]] DataKind _dataKind) override
         {
             _Back() = nlohmann::json::array();
         }

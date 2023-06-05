@@ -133,53 +133,23 @@ namespace Ent
         }
         return nullptr;
     }
-
-    template <typename N> // N : Node or Node const
-    static N* getSceneParentEntity(N* _scene)
-    {
-        N* entity = nullptr;
-        ENTLIB_ASSERT(_scene != nullptr);
-        ENTLIB_ASSERT(_scene->getDataType() == DataType::array);
-        // subSceneData can be null if rootScene was loaded with loadSceneAsNode
-        if (auto* subSceneData = _scene->getParentNode())
-        {
-            ENTLIB_ASSERT(subSceneData != nullptr);
-            ENTLIB_ASSERT(subSceneData->getDataType() == DataType::object);
-            auto* subSceneCpnt = subSceneData->getParentNode(); // SubScene
-            ENTLIB_ASSERT(subSceneCpnt != nullptr);
-            ENTLIB_ASSERT(subSceneCpnt->getDataType() == DataType::object);
-            auto* cpntUnion = subSceneCpnt->getParentNode(); // Component union
-            ENTLIB_ASSERT(cpntUnion != nullptr);
-            ENTLIB_ASSERT(cpntUnion->getDataType() == DataType::oneOf);
-            auto* components = cpntUnion->getParentNode(); // "Components" property (array)
-            ENTLIB_ASSERT(components != nullptr);
-            ENTLIB_ASSERT(components->getDataType() == DataType::array);
-            entity = components->getParentNode(); // Entity
-            ENTLIB_ASSERT(entity != nullptr);
-            ENTLIB_ASSERT(entity->getDataType() == DataType::object);
-            ENTLIB_ASSERT_MSG(
-                entity == nullptr || entity->getSchema()->name == entitySchemaName,
-                "current has to be an Entity but is not!");
-        }
-        return entity;
-    }
-
+    
     static PropImplPtr getSceneParentEntity(PropImpl* _scene)
     {
         PropImplPtr entity;
         ENTLIB_ASSERT(_scene != nullptr);
-        ENTLIB_ASSERT(_scene->getDataType() == DataType::array);
+        ENTLIB_ASSERT(_scene->getDataKind() == DataKind::objectSet);
         // subSceneData can be null if rootScene was loaded with loadSceneAsNode
         if (auto const subSceneCpnt = _scene->getParent())
         {
             ENTLIB_ASSERT(subSceneCpnt != nullptr);
-            ENTLIB_ASSERT(subSceneCpnt->getDataType() == DataType::object);
+            ENTLIB_ASSERT(subSceneCpnt->getDataKind() == DataKind::object);
             auto const components = subSceneCpnt->getParent(); // Component union
             ENTLIB_ASSERT(components != nullptr);
-            ENTLIB_ASSERT(components->getDataType() == DataType::array);
+            ENTLIB_ASSERT(components->getDataKind() == DataKind::unionSet);
             entity = components->getParent(); // Entity
             ENTLIB_ASSERT(entity != nullptr);
-            ENTLIB_ASSERT(entity->getDataType() == DataType::object);
+            ENTLIB_ASSERT(entity->getDataKind() == DataKind::object);
             ENTLIB_ASSERT_MSG(
                 entity == nullptr || entity->getSchema()->name == entitySchemaName,
                 "current has to be an Entity but is not!");
@@ -298,7 +268,7 @@ namespace Ent
         std::vector<std::string> path;
         while (current != nullptr)
         {
-            ENTLIB_ASSERT(current->getDataType() == DataType::object);
+            ENTLIB_ASSERT(current->getDataKind() == DataKind::object);
             path.emplace_back(current->getObjectField("Name")->getString());
             rootScene = current->getParent();
             rootEntity = std::move(current);
@@ -317,7 +287,7 @@ namespace Ent
     std::optional<Property>
     EntityLib::resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const
     {
-        if (_node.getDataType() == DataType::array) // This is a scene
+        if (_node.getDataKind() == DataKind::objectSet) // This is a scene
         {
             if (_entityRef.entityPath.empty())
             {
@@ -345,6 +315,7 @@ namespace Ent
         }
         return std::nullopt;
     }
+
     EntityRef EntityLib::makeEntityRef(Property const& _from, Property const& _to) const
     {
         // get the two absolute path

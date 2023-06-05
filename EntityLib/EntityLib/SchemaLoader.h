@@ -47,7 +47,7 @@ namespace Ent
             virtual void closeSingularItem() = 0;
             virtual void setMaxItems(size_t) = 0;
             virtual void setMinItems(size_t) = 0;
-            virtual void setType(DataType) = 0;
+            virtual void setJsonType(JsonType) = 0;
             virtual void addEnumValue(char const*) = 0;
             virtual void setDefaultValue(Subschema::DefaultValue) = 0;
             virtual void setMinimumValue(Subschema::DefaultValue) = 0;

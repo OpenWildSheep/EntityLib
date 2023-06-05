@@ -118,9 +118,20 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         json nullType;
         nullType["type"] = "null";
 
-        std::array<char const*, static_cast<size_t>(DataType::COUNT)> typeToStr = {
-            "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"};
-        instSchema["type"] = typeToStr[static_cast<size_t>(tmplSchema.type)];
+        std::array<char const*, static_cast<size_t>(DataKind::COUNT)> typeToStr = {
+            "string",
+            "number",
+            "integer",
+            "object",
+            "array",
+            "boolean",
+            "string",
+            "object",
+            "array",
+            "array",
+            "array",
+            "array"};
+        instSchema["type"] = typeToStr[static_cast<size_t>(tmplSchema.getDataKind())];
         std::vector<char const*> requiredList;
         for (auto&& [name, prop] : tmplSchema.properties)
         {
@@ -196,7 +207,8 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
             instSchema["properties"]["InstanceOf"]["type"] = "string";
             instSchema["properties"]["__removed__"]["type"] = "boolean";
         }
-        if (tmplSchema.type == DataType::object)
+        if (tmplSchema.getDataKind() == DataKind::object
+            or tmplSchema.getDataKind() == DataKind::union_)
         {
             instSchema["additionalProperties"] = false;
         }

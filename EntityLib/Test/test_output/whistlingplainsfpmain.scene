@@ -65759,14 +65759,6 @@
                         "Name": "WhislingPlainsFP_Audio_001"
                     },
                     {
-                        "ActorStates": [
-                            {
-                                "classData": {
-                                    "Damages": -1.0
-                                },
-                                "className": "ActorStateAlive"
-                            }
-                        ],
                         "Color": [
                             0.8352942,
                             0.6039216,
@@ -65795,14 +65787,6 @@
                         "Name": "WolfFullBlueIncapacitate_ent_002"
                     },
                     {
-                        "ActorStates": [
-                            {
-                                "classData": {
-                                    "Damages": -1.0
-                                },
-                                "className": "ActorStateAlive"
-                            }
-                        ],
                         "Color": [
                             0.8352942,
                             0.6039216,
@@ -65831,14 +65815,6 @@
                         "Name": "WolfFullBlueIncapacitate_ent_003"
                     },
                     {
-                        "ActorStates": [
-                            {
-                                "classData": {
-                                    "Damages": -1.0
-                                },
-                                "className": "ActorStateAlive"
-                            }
-                        ],
                         "Color": [
                             0.8352942,
                             0.6039216,

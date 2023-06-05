@@ -163,15 +163,15 @@ namespace Ent
     std::vector<Property> Property::getObjectSetItems() const
     {
         std::vector<Property> result;
-        auto const keyType = getPimpl().getObjectSetKeyType();
-        if (keyType == DataType::string or keyType == DataType::entityRef)
+        auto const keyKind = getPimpl().getObjectSetKeyKind();
+        if (keyKind == DataKind::string or keyKind == DataKind::entityRef)
         {
             for (char const* key : getPimpl().getObjectSetKeysString())
             {
                 result.emplace_back(getPimpl().getObjectSetItem(key));
             }
         }
-        else if (keyType == DataType::integer)
+        else if (keyKind == DataKind::integer)
         {
             for (auto const key : getPimpl().getObjectSetKeysInt())
             {

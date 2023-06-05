@@ -35,7 +35,7 @@ namespace Ent
                 // EntityRef are not parsed but handled as primitive type
                 vis.openSubschema();
                 vis.setName("EntityRef");
-                vis.setType(DataType::entityRef);
+                vis.setJsonType(JsonType::entityRef);
                 vis.closeSubschema();
                 return;
             }
@@ -129,7 +129,7 @@ namespace Ent
         }
     }
 
-    Subschema::Meta parseMetaForType(json const& _data, DataType _type)
+    Subschema::Meta parseMetaForType(json const& _data, JsonType _type)
     {
         auto const setBaseMetas = [&](Subschema::BaseMeta* _meta)
         {
@@ -184,51 +184,51 @@ namespace Ent
         };
         switch (_type)
         {
-        case DataType::integer:
-        case DataType::number:
+        case JsonType::integer:
+        case JsonType::number:
         {
             Subschema::NumberMeta meta;
             setBaseMetas(&meta);
             setNumberMetas(meta);
             return meta;
         }
-        case DataType::string:
-        case DataType::object:
-        case DataType::boolean:
-        case DataType::entityRef:
+        case JsonType::string:
+        case JsonType::object:
+        case JsonType::boolean:
+        case JsonType::entityRef:
         {
             Subschema::GenericMeta meta;
             setBaseMetas(&meta);
             return meta;
         }
-        case DataType::array:
+        case JsonType::array:
         {
             Subschema::ArrayMeta meta;
             setBaseMetas(&meta);
             setArrayMetas(meta);
             return meta;
         }
-        case DataType::oneOf:
+        case JsonType::oneOf:
         {
             Subschema::UnionMeta meta;
             setBaseMetas(&meta);
             setUnionMetas(meta);
             return meta;
         }
-        case DataType::null:
-        case DataType::COUNT:
-        default: ENTLIB_ASSERT_MSG(false, "Invalid DataType when parsing meta"); return {};
+        case JsonType::null:
+        case JsonType::COUNT:
+        default: ENTLIB_ASSERT_MSG(false, "Invalid JsonType when parsing meta"); return {};
         }
     }
 
     void SchemaLoader::parseSchemaNoRef(
         std::string const& _filename, json const& _rootFile, json const& _data, Visitor& vis, int depth)
     {
-        auto currentType = DataType::null;
-        auto const setType = [&](DataType _type)
+        auto currentType = JsonType::null;
+        auto const setJsonType = [&](JsonType _type)
         {
             currentType = _type;
-            vis.setType(_type);
+            vis.setJsonType(_type);
         };
         // type
         if (_data.count("type") != 0u)
@@ -240,31 +240,31 @@ namespace Ent
             }
             else if (type == "array")
             {
-                setType(DataType::array);
+                setJsonType(JsonType::array);
             }
             else if (type == "boolean")
             {
-                setType(DataType::boolean);
+                setJsonType(JsonType::boolean);
             }
             else if (type == "integer")
             {
-                setType(DataType::integer);
+                setJsonType(JsonType::integer);
             }
             else if (type == "null")
             {
-                setType(DataType::null);
+                setJsonType(JsonType::null);
             }
             else if (type == "number")
             {
-                setType(DataType::number);
+                setJsonType(JsonType::number);
             }
             else if (type == "object")
             {
-                setType(DataType::object);
+                setJsonType(JsonType::object);
             }
             else if (type == "string")
             {
-                setType(DataType::string);
+                setJsonType(JsonType::string);
             }
             else
             {
@@ -274,7 +274,7 @@ namespace Ent
         // properties
         if (_data.count("properties") != 0u)
         {
-            setType(DataType::object);
+            setJsonType(JsonType::object);
             for (auto&& name_prop : _data["properties"].items())
             {
                 auto const& propName = name_prop.key();
@@ -296,16 +296,16 @@ namespace Ent
             vis.setDefaultValue(def);
             switch (def.type())
             {
-            case json::value_t::null: setType(DataType::null); break;
-            case json::value_t::object: setType(DataType::object); break;
-            case json::value_t::array: setType(DataType::array); break;
+            case json::value_t::null: setJsonType(JsonType::null); break;
+            case json::value_t::object: setJsonType(JsonType::object); break;
+            case json::value_t::array: setJsonType(JsonType::array); break;
             case json::value_t::binary:
             case json::value_t::discarded: break;
-            case json::value_t::string: setType(DataType::string); break;
-            case json::value_t::boolean: setType(DataType::boolean); break;
+            case json::value_t::string: setJsonType(JsonType::string); break;
+            case json::value_t::boolean: setJsonType(JsonType::boolean); break;
             case json::value_t::number_integer:
-            case json::value_t::number_unsigned: setType(DataType::integer); break;
-            case json::value_t::number_float: setType(DataType::number); break;
+            case json::value_t::number_unsigned: setJsonType(JsonType::integer); break;
+            case json::value_t::number_float: setJsonType(JsonType::number); break;
             }
         }
         if (auto const minIterator = _data.find("minimum"); minIterator != _data.end())
@@ -324,21 +324,21 @@ namespace Ent
             vis.setConstValue(def);
             switch (def.type())
             {
-            case json::value_t::null: setType(DataType::null); break;
-            case json::value_t::object: setType(DataType::object); break;
-            case json::value_t::array: setType(DataType::array); break;
+            case json::value_t::null: setJsonType(JsonType::null); break;
+            case json::value_t::object: setJsonType(JsonType::object); break;
+            case json::value_t::array: setJsonType(JsonType::array); break;
             case json::value_t::binary:
             case json::value_t::discarded: break;
-            case json::value_t::string: setType(DataType::string); break;
-            case json::value_t::boolean: setType(DataType::boolean); break;
+            case json::value_t::string: setJsonType(JsonType::string); break;
+            case json::value_t::boolean: setJsonType(JsonType::boolean); break;
             case json::value_t::number_integer:
-            case json::value_t::number_unsigned: setType(DataType::integer); break;
-            case json::value_t::number_float: setType(DataType::number); break;
+            case json::value_t::number_unsigned: setJsonType(JsonType::integer); break;
+            case json::value_t::number_float: setJsonType(JsonType::number); break;
             }
         }
         if (_data.count("items") != 0u)
         {
-            setType(DataType::array);
+            setJsonType(JsonType::array);
             auto const& items = _data["items"];
             // items linear
             if (items.type() == json::value_t::array)
@@ -365,7 +365,7 @@ namespace Ent
         }
         if (_data.count("oneOf") != 0u)
         {
-            setType(DataType::oneOf);
+            setJsonType(JsonType::oneOf);
             auto const& items = _data["oneOf"];
             vis.setOneOf(items.size());
             for (size_t index = 0; index < items.size(); ++index)
@@ -409,16 +409,16 @@ namespace Ent
                 ENTLIB_LOGIC_ERROR(
                     "Unexpected json items type for \"meta\" : %s", _data["meta"].type_name());
             }
-            if (currentType == DataType::null)
+            if (currentType == JsonType::null)
             {
                 // Unions doesn't have "type" field in RuntimeComponents.json
-                setType(DataType::object);
+                setJsonType(JsonType::object);
             }
             vis.setMeta(
                 parseMetaForType(_data["meta"], currentType),
                 _data["meta"].value("user", json::object()));
         }
-        else if (currentType != DataType::null)
+        else if (currentType != JsonType::null)
         {
             // Set Meta to default values for the currentType
             vis.setMeta(parseMetaForType(json::object(), currentType), json::object());
@@ -439,36 +439,36 @@ namespace Ent
 
     DataKind computeDataKind(Subschema const& _subschema)
     {
-        switch (_subschema.type)
+        switch (_subschema.jsonType)
         {
-        case DataType::string: return DataKind::string;
-        case DataType::number: return DataKind::number;
-        case DataType::integer: return DataKind::integer;
-        case DataType::object: return DataKind::object;
-        case DataType::boolean: return DataKind::boolean;
-        case DataType::entityRef: return DataKind::entityRef;
-        case DataType::oneOf: return DataKind::union_;
-        case DataType::array:
+        case JsonType::string: return DataKind::string;
+        case JsonType::number: return DataKind::number;
+        case JsonType::integer: return DataKind::integer;
+        case JsonType::object: return DataKind::object;
+        case JsonType::boolean: return DataKind::boolean;
+        case JsonType::entityRef: return DataKind::entityRef;
+        case JsonType::oneOf: return DataKind::union_;
+        case JsonType::array:
             switch (hash(std::get<Subschema::ArrayMeta>(_subschema.meta).overridePolicy))
             {
             case "map"_hash: return DataKind::map;
             case "set"_hash:
-                switch (_subschema.singularItems->get().type)
+                switch (_subschema.singularItems->get().jsonType)
                 {
-                case DataType::integer: [[fallthrough]];
-                case DataType::entityRef: [[fallthrough]];
-                case DataType::string: return DataKind::primitiveSet;
-                case DataType::oneOf: return DataKind::unionSet;
-                case DataType::object: return DataKind::objectSet;
-                default: return DataKind::COUNT;
+                case JsonType::integer: [[fallthrough]];
+                case JsonType::entityRef: [[fallthrough]];
+                case JsonType::string: return DataKind::primitiveSet;
+                case JsonType::oneOf: return DataKind::unionSet;
+                case JsonType::object: return DataKind::objectSet;
+                default: return DataKind::array;
                 }
             case ""_hash: return DataKind::array;
             }
             ENTLIB_LOGIC_ERROR("Unexpected overridePolicy !");
-        case DataType::COUNT: break;
-        case DataType::null: break;
+        case JsonType::COUNT: break;
+        case JsonType::null: break;
         }
-        ENTLIB_LOGIC_ERROR("Unexpected DataType !");
+        ENTLIB_LOGIC_ERROR("Unexpected JsonType !");
     }
 
     void SchemaLoader::readSchema(
@@ -513,7 +513,7 @@ namespace Ent
             {
                 CHECK_WHOLE_STACK;
                 ENTLIB_ASSERT(
-                    stack.back()->get().type != DataType::array
+                    stack.back()->get().jsonType != JsonType::array
                     or stack.back()->get().singularItems != nullptr
                     or stack.back()->get().linearItems.has_value());
                 stack.pop_back();
@@ -524,7 +524,7 @@ namespace Ent
             {
                 CHECK_WHOLE_STACK;
                 ENTLIB_ASSERT(
-                    stack.back()->get().type != DataType::array
+                    stack.back()->get().jsonType != JsonType::array
                     or stack.back()->get().singularItems != nullptr
                     or stack.back()->get().linearItems.has_value());
                 stack.pop_back();
@@ -535,7 +535,7 @@ namespace Ent
             {
                 CHECK_WHOLE_STACK;
                 ENTLIB_ASSERT(
-                    stack.back()->get().type != DataType::array
+                    stack.back()->get().jsonType != JsonType::array
                     or stack.back()->get().singularItems != nullptr
                     or stack.back()->get().linearItems.has_value());
                 stack.pop_back();
@@ -620,17 +620,17 @@ namespace Ent
                 CHECK_WHOLE_STACK;
                 stack.back()->get().minItems = val;
             }
-            void setType(DataType type) override
+            void setJsonType(JsonType type) override
             {
                 ENTLIB_DEBUG_PRINTF("%ssetType %d\n", getTab(), (int)type);
                 CHECK_WHOLE_STACK;
-                stack.back()->get().type = type;
+                stack.back()->get().jsonType = type;
             }
             void setOneOf(size_t size) override
             {
                 ENTLIB_DEBUG_PRINTF("%ssetOneOf %zu\n", getTab(), size);
                 CHECK_WHOLE_STACK;
-                stack.back()->get().type = DataType::oneOf;
+                stack.back()->get().jsonType = JsonType::oneOf;
                 stack.back()->get().oneOf = std::vector<SubschemaRef>();
                 stack.back()->get().oneOf->resize(size);
             }
@@ -672,7 +672,7 @@ namespace Ent
                     return;
                 }
                 // Fill the Subschema::unionTypeMap
-                if (lastSchema.type == DataType::oneOf)
+                if (lastSchema.jsonType == JsonType::oneOf)
                 {
                     if (auto const* un = std::get_if<Subschema::UnionMeta>(&lastSchema.meta))
                     {
@@ -722,7 +722,7 @@ namespace Ent
                 if (stack.size() > 1)
                 {
                     auto const& lastSchema = stack.back()->get();
-                    if (lastSchema.type == DataType::array)
+                    if (lastSchema.jsonType == JsonType::array)
                     {
                         auto const& lastMeta = std::get<Subschema::ArrayMeta>(lastSchema.meta);
                         if (lastMeta.overridePolicy == "map")

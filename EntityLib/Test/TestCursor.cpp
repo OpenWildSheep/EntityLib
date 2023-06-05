@@ -73,7 +73,7 @@ public:
     {
         --tab;
     }
-    void inPrimSet([[maybe_unused]] Property const& _prop, [[maybe_unused]] DataType _dataType) override
+    void inPrimSet([[maybe_unused]] Property const& _prop, [[maybe_unused]] DataKind _dataKind) override
     {
         ++tab;
     }
@@ -138,10 +138,6 @@ public:
     void outArray([[maybe_unused]] Property const& _prop) override
     {
         --tab;
-    }
-    void nullProperty([[maybe_unused]] Property const& _prop) override
-    {
-        std::cout << getTab() << "null" << std ::endl;
     }
     void boolProperty(Property const& _prop) override
     {
@@ -228,13 +224,13 @@ public:
     {
         ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         ENTLIB_ASSERT(expl2.size() == _prop.size());
-        switch (_prop.getMapKeyType())
+        switch (_prop.getMapKeyKind())
         {
-        case DataType::entityRef: [[fallthrough]];
-        case DataType::string:
+        case DataKind::entityRef: [[fallthrough]];
+        case DataKind::string:
             ENTLIB_ASSERT(expl2.getMapKeysString().size() == _prop.getMapKeysString().size());
             break;
-        case DataType::integer:
+        case DataKind::integer:
             ENTLIB_ASSERT(expl2.getMapKeysInt().size() == _prop.getMapKeysInt().size());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -254,18 +250,18 @@ public:
     {
         pop();
     }
-    void inPrimSet(Property const& _prop, [[maybe_unused]] DataType _dataType) override
+    void inPrimSet(Property const& _prop, [[maybe_unused]] DataKind _dataKind) override
     {
         ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         auto const& itemType = _prop.getSchema()->singularItems->get();
-        switch (itemType.type)
+        switch (itemType.getDataKind())
         {
-        case DataType::entityRef: [[fallthrough]];
-        case DataType::string:
+        case DataKind::entityRef: [[fallthrough]];
+        case DataKind::string:
             ENTLIB_ASSERT(expl2.getPrimSetKeysString() == _prop.getPrimSetKeysString());
             break;
-        case DataType::integer:
+        case DataKind::integer:
             ENTLIB_ASSERT(expl2.getPrimSetKeysInt() == _prop.getPrimSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -317,10 +313,10 @@ public:
         }
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
-        switch (expl2.getObjectSetKeyType())
+        switch (expl2.getObjectSetKeyKind())
         {
-        case DataType::entityRef: [[fallthrough]];
-        case DataType::string:
+        case DataKind::entityRef: [[fallthrough]];
+        case DataKind::string:
         {
             auto const a = expl2.getObjectSetKeysString();
             auto const b = _prop.getObjectSetKeysString();
@@ -332,7 +328,7 @@ public:
             }
             break;
         }
-        case DataType::integer:
+        case DataKind::integer:
             ENTLIB_ASSERT(expl2.getObjectSetKeysInt() == _prop.getObjectSetKeysInt());
             break;
         default: ENTLIB_LOGIC_ERROR("Unexpected key type");
@@ -363,10 +359,6 @@ public:
     {
         ENTLIB_ASSERT(expl2.size() == _prop.size());
         ENTLIB_ASSERT(expl2.isSet() == _prop.isSet());
-    }
-    void nullProperty([[maybe_unused]] Property const& _prop) override
-    {
-        ENTLIB_ASSERT(expl2.getDataType() == DataType::null);
     }
     void boolProperty([[maybe_unused]] Property const& _prop) override
     {
@@ -415,10 +407,6 @@ public:
         ++primitiveCount;
     }
     void key([[maybe_unused]] Property const& _prop, [[maybe_unused]] int64_t _key) override
-    {
-        ++primitiveCount;
-    }
-    void nullProperty([[maybe_unused]] Property const& _prop) override
     {
         ++primitiveCount;
     }

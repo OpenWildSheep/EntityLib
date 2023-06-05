@@ -75,9 +75,9 @@ namespace Ent
                 return getProperty().getSchema();
             }
 
-            [[nodiscard]] DataType getDataType() const
+            [[nodiscard]] DataKind getDataKind() const
             {
-                return getProperty().getSchema()->type;
+                return getProperty().getSchema()->getDataKind();
             }
 
             void applyToPrefab()

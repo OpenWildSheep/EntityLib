@@ -16,7 +16,7 @@
 namespace Ent
 {
     /// Internal type of a property Node
-    enum class DataType
+    enum class JsonType
     {
         null,
         string, ///< Contains a string
@@ -98,9 +98,9 @@ namespace Ent
         /// @endcond
 
         Schema* rootSchema{};
-        DataType type = DataType::null; ///< type of this Subschema. @see Ent::DataType
+        JsonType jsonType = JsonType::null; ///< type of this Subschema. @see Ent::JsonType
         bool required = false; ///< Is this property required?
-        std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataType::object, child properties
+        std::map<std::string, SubschemaRef> properties; ///< If type == Ent::DataKind::object, child properties
         size_t maxItems =
             static_cast<size_t>(-1); ///< Maximum size of the array. (inclusive) [min, max]
         size_t minItems = 0; ///< @brief Minimum size of an array
@@ -195,7 +195,7 @@ namespace Ent
         [[nodiscard]] char const* getUnionDefaultTypeName() const;
 
         /// @brief Get the type of the Key of a map or set
-        [[nodiscard]] DataType getMapKeyType() const;
+        [[nodiscard]] DataKind getMapKeyKind() const;
 
         [[nodiscard]] DataKind getDataKind() const;
 
@@ -203,7 +203,7 @@ namespace Ent
 
         [[nodiscard]] bool isValidEnumString(std::string_view str) const;
 
-        /// Contains the simple value of one of the possible Ent::DataType
+        /// Contains the simple value of one of the possible Ent::DataKind
         using DefaultValue = nlohmann::json;
         DefaultValue defaultValue; ///< @brief Contains the data according to the type
         DefaultValue minimum; ///< Minimum accepted value
@@ -212,13 +212,13 @@ namespace Ent
 
         /// @brief Subschema of the unique type of item
         ///
-        /// If type == Ent::DataType::array,
+        /// If jsonType == Ent::JsonType::array,
         ///   If all items have the same type (SingularItem),
         ///     This is the description of the items
         std::unique_ptr<SubschemaRef> singularItems;
         /// @brief Subschema of each items
         ///
-        /// If type == Ent::DataType::array,
+        /// If getDataKind() == Ent::DataKind::array,
         ///   If all items have a different type (LinearItem),
         ///     This is the description of each items
         std::optional<std::vector<SubschemaRef>> linearItems;
@@ -352,9 +352,9 @@ namespace Ent
             meta);
     }
 
-    inline DataType Subschema::getMapKeyType() const
+    inline DataKind Subschema::getMapKeyKind() const
     {
-        return singularItems->get().linearItems->at(0)->type;
+        return singularItems->get().linearItems->at(0)->getDataKind();
     }
 
     inline Subschema const& SubschemaRef::get() const

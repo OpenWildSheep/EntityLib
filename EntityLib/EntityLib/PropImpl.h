@@ -135,16 +135,15 @@ namespace Ent
         /// @return The index of the type of the Union
         /// @pre It is a Union
         [[nodiscard]] size_t getUnionTypeIndex();
-        [[nodiscard]] DataType getDataType(); ///< Get the DataType of a Node
 
         [[nodiscard]] Subschema const* getSchema(); ///< Get the Schema of the current Node
 
         [[nodiscard]] char const* getTypeName(); ///< Get the Schema name of the current Node
 
-        [[nodiscard]] DataType getMapKeyType(); ///< @pre Map @brief Get the key type current Map
-        [[nodiscard]] DataType
-        getObjectSetKeyType(); ///< @pre ObjectSet @brief Get the key type current ObjectSet
-        [[nodiscard]] DataType getPrimSetKeyType(); ///< @pre PrimitiveSet @brief Get the key type Set
+        [[nodiscard]] DataKind getMapKeyKind(); ///< @pre Map @brief Get the key type current Map
+        [[nodiscard]] DataKind
+        getObjectSetKeyKind(); ///< @pre ObjectSet @brief Get the key type current ObjectSet
+        [[nodiscard]] DataKind getPrimSetKeyKind(); ///< @pre PrimitiveSet @brief Get the key type Set
 
         [[nodiscard]] size_t size(); ///< @return the size the this Node whatever it is.
         [[nodiscard]] bool contains(Key const& _key); ///< @pre map/set. @return true if it contains _key.
@@ -245,7 +244,7 @@ namespace Ent
         [[nodiscard]] std::optional<int64_t> getPrefabSize();
 
         [[nodiscard]] std::vector<char const*>
-        getFieldNames(); ///< @pre type==Ent::DataType::object @brief Get all field names
+        getFieldNames(); ///< @pre getDataKind()==Ent::DataKind::object @brief Get all field names
 
         [[nodiscard]] PropImpl* getPrefab() const; ///< Get the PropImpl of the prefab
         [[nodiscard]] nlohmann::json const* getRawJson(); ///< Get the underlying json node of the instance

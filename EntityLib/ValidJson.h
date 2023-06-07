@@ -3,7 +3,7 @@
 #include <filesystem>
 
 #pragma warning(push, 0)
-#include "../external/json.hpp"
+#include <json.hpp>
 #pragma warning(pop)
 
 /// \cond PRIVATE

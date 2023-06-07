@@ -24,9 +24,13 @@ Value getPropValue(Property const& _prop)
 {
     switch (_prop.getDataKind())
     {
-    case DataKind::array:
-    case DataKind::object:
-    case DataKind::union_:
+    case DataKind::array: [[fallthrough]];
+    case DataKind::unionSet: [[fallthrough]];
+    case DataKind::map: [[fallthrough]];
+    case DataKind::objectSet: [[fallthrough]];
+    case DataKind::object: [[fallthrough]];
+    case DataKind::primitiveSet: [[fallthrough]];
+    case DataKind::union_: return nullptr;
     case DataKind::boolean: return _prop.getBool();
     case DataKind::integer: return _prop.getInt();
     case DataKind::number: return _prop.getFloat();

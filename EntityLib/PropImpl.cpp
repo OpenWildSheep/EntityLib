@@ -1,4 +1,7 @@
 #include "PropImpl.h"
+
+#include <iso646.h>
+
 #include "include/EntityLib.h"
 
 namespace Ent
@@ -177,7 +180,8 @@ namespace Ent
     bool PropImpl::_loadInstanceOf()
     {
         auto const* subschema = m_instance.getSchema();
-        if ((subschema->getDataKind() == DataKind::object or subschema->getDataKind() == DataKind::union_)
+        if ((subschema->getDataKind() == DataKind::object
+             or subschema->getDataKind() == DataKind::union_)
             and m_instance.isSet())
         {
             if (auto const* doc = m_instance.getJson())
@@ -448,8 +452,7 @@ namespace Ent
         auto newLayerPtr = m_entityLib->newPropImpl();
         PropImpl& newLayer = *newLayerPtr;
         newLayer.m_entityLib = m_entityLib;
-        ENTLIB_DBG_ASSERT(
-            m_instance.getSchema()->getDataKind() == DataKind::array);
+        ENTLIB_DBG_ASSERT(m_instance.getSchema()->getDataKind() == DataKind::array);
         newLayer.m_instance = m_instance.getArrayItem(_index);
         newLayer.m_parent = sharedFromThis();
         auto const* subschema = newLayer.getSchema();
@@ -599,7 +602,7 @@ namespace Ent
         }
 #endif
     }
-    
+
     Subschema const* PropImpl::getSchema()
     {
         _reResolveIfNeeded();

@@ -527,6 +527,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("reset_instance_of", &Property::resetInstanceOf)
         .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
         .def_property_readonly("first_instance_of", &Property::getFirstInstanceOf)
+        .def_property_readonly("entitylib", &Property::getEntityLib)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
         .def_property_readonly("data_kind", &Property::getDataKind)
         .def_property_readonly("schema", &Property::getSchema, py::return_value_policy::reference_internal)

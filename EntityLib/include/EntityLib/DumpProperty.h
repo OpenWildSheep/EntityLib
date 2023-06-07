@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <ciso646>
 
 #include "Visitor.h"
 #include "Property.h"

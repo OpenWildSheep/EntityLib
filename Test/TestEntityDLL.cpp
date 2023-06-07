@@ -9,7 +9,7 @@
 #pragma warning(pop)
 
 #include <EntityLib.h>
-#include <../cpp2/EntGen.h>
+#include <EntGen.h>
 #include <ComponentMerge.h>
 
 #include "TestCursor.h"
@@ -1546,7 +1546,7 @@ try
         instanceOf.save("setInstanceOf.entity");
     }
     testCreateInstanceOf("setInstanceOf.entity");
-    
+
     // ******************* Test load/save complex entity pinetreec50cmh5mbasic ********************
     {
         auto ent = Gen::Entity::loadCopy(entlib, "pinetreec50cmh5mbasic.entity");
@@ -1663,7 +1663,7 @@ try
         auto scene = sceneent.Components().SubScene()->Embedded();
 
         ENTLIB_LOG("Done");
-        
+
         auto heightObj = scene.begin()->Components().addHeightObj();
         heightObj.DisplaceNoiseList().push();
 

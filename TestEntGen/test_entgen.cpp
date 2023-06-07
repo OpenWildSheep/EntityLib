@@ -1,4 +1,4 @@
-#include <../cpp2/EntGen.h>
+#include <EntGen.h>
 #include <ciso646>
 #include <filesystem>
 #include <iostream>

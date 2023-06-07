@@ -1,5 +1,6 @@
 #include <ComponentMerge.h>
 
+#include <ciso646>
 #include <filesystem>
 #include <set>
 #include <fstream>

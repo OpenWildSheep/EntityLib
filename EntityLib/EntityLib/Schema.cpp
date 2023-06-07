@@ -8,7 +8,7 @@ namespace Ent
 {
     std::pair<Subschema const*, size_t> Subschema::getUnionTypeWrapper(char const* _subtype) const
     {
-        if (type != DataType::oneOf)
+        if (getDataKind() != DataKind::union_)
         {
             throw BadType();
         }
@@ -33,7 +33,7 @@ namespace Ent
 
     char const* Subschema::getUnionNameField() const
     {
-        if (type != DataType::oneOf)
+        if (getDataKind() != DataKind::union_)
         {
             throw BadType();
         }
@@ -48,7 +48,7 @@ namespace Ent
 
     char const* Subschema::getUnionDataField() const
     {
-        if (type != DataType::oneOf)
+        if (getDataKind() != DataKind::union_)
         {
             throw BadType();
         }
@@ -63,7 +63,7 @@ namespace Ent
 
     std::map<std::string, Subschema const*> Subschema::getUnionTypesMap() const
     {
-        if (type != DataType::oneOf)
+        if (getDataKind() != DataKind::union_)
         {
             throw BadType();
         }
@@ -96,8 +96,9 @@ namespace Ent
 
     bool Subschema::isPrimitive() const
     {
-        return type == DataType::string or type == DataType::integer or type == DataType::boolean
-               or type == DataType::number or type == DataType::entityRef;
+        return getDataKind() == DataKind::string or getDataKind() == DataKind::integer
+               or getDataKind() == DataKind::boolean or getDataKind() == DataKind::number
+               or getDataKind() == DataKind::entityRef;
     }
 
     bool Subschema::isValidEnumString(std::string_view str) const

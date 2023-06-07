@@ -8,7 +8,7 @@ using namespace Ent::Gen2;
 int main()
 try
 {
-    Ent::EntityLib entlib("X:/", true);
+    Ent::EntityLib entlib("X:/RawData", "X:/Tools/WildPipeline/Schema");
     entlib.rawdataPath = canonical(std::filesystem::current_path() / "../Test");
 
     Ent::Property expl(&entlib, entlib.getSchema(Entity::schemaName), "instance.entity");

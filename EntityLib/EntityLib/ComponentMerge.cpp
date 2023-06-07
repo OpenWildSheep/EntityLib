@@ -16,7 +16,7 @@ namespace Ent
 {
 
     // When schema branches a copied from a file to an other, the local references become external
-    void updateRefLinks(std::string const& _sourceFile, json& _node)
+    void updateRefLinks(json& _node)
     {
         switch (_node.type())
         {
@@ -43,7 +43,7 @@ namespace Ent
                 }
                 else
                 {
-                    updateRefLinks(_sourceFile, field.value());
+                    updateRefLinks(field.value());
                 }
             }
         }
@@ -52,14 +52,14 @@ namespace Ent
         {
             for (auto& item : _node)
             {
-                updateRefLinks(_sourceFile, item);
+                updateRefLinks(item);
             }
         }
         break;
         case detail::value_t::binary:
         case detail::value_t::discarded: break;
         }
-    };
+    }
 
     bool isComponent(json const& mergedCompSch, json const& node)
     {
@@ -80,18 +80,10 @@ namespace Ent
         return false;
     }
 
-    json mergeComponents(std::filesystem::path const& _toolsDir)
+    json mergeSchemas(
+        std::filesystem::path const& _dependencyPaths, std::vector<SchemaInput> const& _schemaInputs)
     {
-        json const runtimeCmps =
-            loadJsonFile(_toolsDir, "WildPipeline/Schema/RuntimeComponents.json");
-        json const editionCmps =
-            loadJsonFile(_toolsDir, "WildPipeline/Schema/EditionComponents.json");
-        json const sceneDefs = loadJsonFile(_toolsDir, "WildPipeline/Schema/Scene-schema.json");
-        json const dependencies = loadJsonFile(_toolsDir, "WildPipeline/Schema/Dependencies.json");
-
-        json const& runtimeCompSch = runtimeCmps.at("definitions");
-        json const& editionCompSch = editionCmps.at("definitions");
-        json const& sceneDefSch = sceneDefs.at("definitions");
+        json const dependencies = loadJsonFile("", _dependencyPaths);
 
         json mergedCompSch;
         mergedCompSch["$schema"] = "http://json-schema.org/draft-07/schema#";
@@ -106,37 +98,45 @@ namespace Ent
         std::map<std::string, json const*> editionCompMap;
         struct Def
         {
-            std::vector<json const*> defintions;
+            std::vector<json> definitions;
             bool inRuntime = false;
             bool inEdition = false;
         };
         std::map<std::string, Def> definitionsMap;
-        for (auto&& [name, comp] : runtimeCompSch.items())
+        auto addInDefinitions =
+            [&](std::filesystem::path const& _schemaPath, SchemaSource _schemaSource)
         {
-            definitionsMap[name].defintions.push_back(&comp);
-            definitionsMap[name].inRuntime = true;
-        }
-        for (auto&& [name, comp] : editionCompSch.items())
+            json schemaDoc = loadJsonFile("", _schemaPath);
+            json& definitions = schemaDoc.at("definitions");
+            for (auto&& [name, comp] : definitions.items())
+            {
+                definitionsMap[name].definitions.emplace_back(move(comp));
+                switch (_schemaSource)
+                {
+                case SchemaSource::Runtime: definitionsMap[name].inRuntime = true; break;
+                case SchemaSource::Edition: definitionsMap[name].inEdition = true; break;
+                }
+            }
+        };
+
+        for (auto const& [path, source] : _schemaInputs)
         {
-            definitionsMap[name].defintions.push_back(&comp);
-            definitionsMap[name].inEdition = true;
-        }
-        for (auto&& [name, comp] : sceneDefSch.items())
-        {
-            definitionsMap[name].defintions.push_back(&comp);
-            definitionsMap[name].inEdition = true;
+            addInDefinitions(path, source);
         }
 
         for (auto&& [name, defs] : definitionsMap)
         {
-            json mergedDefinition = *defs.defintions.back();
-            defs.defintions.pop_back();
-            for (auto const* def : defs.defintions)
+            json mergedDefinition = defs.definitions.back();
+            mergedDefinition["meta"];
+            defs.definitions.pop_back();
+            mergedDefinition["meta"];
+            for (json const& def : defs.definitions)
             {
+                mergedDefinition["meta"];
                 printf("Merged type : %s\n", name.c_str());
-                if (def->count("properties") != 0)
+                if (def.count("properties") != 0)
                 {
-                    for (auto&& [pname, prop] : def->at("properties").items())
+                    for (auto&& [pname, prop] : def.at("properties").items())
                     {
                         if (mergedDefinition["properties"].count(pname) != 0)
                         {
@@ -148,12 +148,13 @@ namespace Ent
                         mergedDefinition["properties"][pname] = prop;
                     }
                 }
+                mergedDefinition["meta"];
             }
             // Merge the meta data
             mergedDefinition["meta"]["editor"] = defs.inEdition;
             mergedDefinition["meta"]["runtime"] = defs.inRuntime;
 
-            updateRefLinks("RuntimeComponents.json", mergedDefinition);
+            updateRefLinks(mergedDefinition);
             // Add the new schema of the merged component in Scene-schema.json
             mergedCompSch["definitions"][name] = std::move(mergedDefinition);
         }
@@ -179,34 +180,36 @@ namespace Ent
         return mergedCompSch;
     }
 
-    void updateComponents(std::filesystem::path const& _toolsDir)
+    void updateSchemas(
+        std::filesystem::path const& _toolsDir,
+        std::filesystem::path const& _dependencyPaths,
+        std::vector<SchemaInput> const& _schemaInputs,
+        std::filesystem::path const& _outputPath)
     {
-        json sceneSch = mergeComponents(_toolsDir);
-        auto const* mergedComponentsSchemaLocation = "WildPipeline/Schema/MergedComponents.json";
-        auto mergedSchemaPath = _toolsDir / mergedComponentsSchemaLocation;
+        json sceneSch = mergeSchemas(_dependencyPaths, _schemaInputs);
         {
+            auto const mergedSchemaPath = _outputPath / "MergedComponents.json";
             std::stringstream buffer;
             buffer << sceneSch.dump(4);
             std::ofstream file(mergedSchemaPath);
             if (not file.is_open())
             {
                 throw FileSystemError(
-                    "Trying to open file for write", _toolsDir, mergedComponentsSchemaLocation);
+                    "Trying to open file for write", _outputPath, "MergedComponents.json");
             }
             file << buffer.str();
         }
         // Export all type schemas in the "all" subdirectory
         // Actually each file only reference the "TextEditorsSchema.json" file.
-        auto allSingleSchemaPath = std::filesystem::path("WildPipeline/Schema/all");
-        create_directories(_toolsDir / allSingleSchemaPath);
+        auto allSingleSchemaPath = std::filesystem::path(_outputPath / "all");
+        create_directories(allSingleSchemaPath);
         for (auto&& [name, defs] : sceneSch["definitions"].items())
         {
             auto escapedName = name;
             std::replace(begin(escapedName), end(escapedName), ':', '_');
             std::replace(begin(escapedName), end(escapedName), '>', '_');
             std::replace(begin(escapedName), end(escapedName), '<', '_');
-            auto const relativeSchemaPath = allSingleSchemaPath / (escapedName + ".json");
-            auto const schemaPath = _toolsDir / relativeSchemaPath;
+            auto const schemaPath = allSingleSchemaPath / (escapedName + ".json");
             if (schemaPath.native().size() < 255) // Can't write filename longer than 255 characters
             {
                 json singleSchema;
@@ -216,28 +219,25 @@ namespace Ent
                 std::ofstream file(schemaPath);
                 if (not file.is_open())
                 {
-                    throw FileSystemError(
-                        "Trying to open file for write", _toolsDir, relativeSchemaPath);
+                    throw FileSystemError("Trying to open file for write", "", schemaPath);
                 }
                 file << buffer.str();
             }
         }
         // Write the "TextEditorsSchema.json" file. Containing all schema for all types.
-        EntityLib entlib(_toolsDir.parent_path());
+        EntityLib entlib(_toolsDir.parent_path() / "RawData", _toolsDir / "WildPipeline/Schema");
         json fullWildSchema = createValidationSchema(entlib.schema.schema);
-        {
-            auto const* fullWildSchemaLocation = "WildPipeline/Schema/TextEditorsSchema.json";
-            std::stringstream buffer;
-            buffer << fullWildSchema.dump(4);
+        auto const fullWildSchemaLocation = _outputPath / "TextEditorsSchema.json";
+        std::stringstream buffer;
+        buffer << fullWildSchema.dump(4);
 
-            std::ofstream file(_toolsDir / fullWildSchemaLocation);
-            if (not file.is_open())
-            {
-                throw FileSystemError(
-                    "Trying to open file for write", _toolsDir, fullWildSchemaLocation);
-            }
-            file << buffer.str();
+        std::ofstream file(fullWildSchemaLocation);
+        if (not file.is_open())
+        {
+            throw FileSystemError(
+                "Trying to open file for write", _outputPath, "TextEditorsSchema.json");
         }
+        file << buffer.str();
     }
 
 } // namespace Ent

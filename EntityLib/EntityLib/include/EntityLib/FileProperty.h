@@ -160,7 +160,7 @@ namespace Ent
 
         [[nodiscard]] Key const& getPathToken() const; ///< Get the path token used to get this from parent
 
-        [[nodiscard]] DataType getMapKeyType() const; ///< Get the type of the ket of the map or set
+        [[nodiscard]] DataKind getMapKeyKind() const; ///< Get the type of the ket of the map or set
 
         [[nodiscard]] bool countPrimSetKey(char const* _key);
         [[nodiscard]] bool countPrimSetKey(int64_t _key);
@@ -292,9 +292,9 @@ namespace Ent
         size_t m_lastAccessGlobalVersion = 0;
     };
 
-    inline DataType FileProperty::getMapKeyType() const
+    inline DataKind FileProperty::getMapKeyKind() const
     {
-        return getSchema()->getMapKeyType();
+        return getSchema()->getMapKeyKind();
     }
 
 } // namespace Ent

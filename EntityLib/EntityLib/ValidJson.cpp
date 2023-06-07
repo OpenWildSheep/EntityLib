@@ -118,9 +118,20 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         json nullType;
         nullType["type"] = "null";
 
-        std::array<char const*, static_cast<size_t>(DataType::COUNT)> typeToStr = {
-            "null", "string", "number", "integer", "object", "array", "boolean", "string", "object"};
-        instSchema["type"] = typeToStr[static_cast<size_t>(tmplSchema.type)];
+        std::array<char const*, static_cast<size_t>(DataKind::COUNT)> typeToStr = {
+            "string",
+            "number",
+            "integer",
+            "object",
+            "array",
+            "boolean",
+            "string",
+            "object",
+            "array",
+            "array",
+            "array",
+            "array"};
+        instSchema["type"] = typeToStr[static_cast<size_t>(tmplSchema.getDataKind())];
         std::vector<char const*> requiredList;
         for (auto&& [name, prop] : tmplSchema.properties)
         {
@@ -196,7 +207,8 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
             instSchema["properties"]["InstanceOf"]["type"] = "string";
             instSchema["properties"]["__removed__"]["type"] = "boolean";
         }
-        if (tmplSchema.type == DataType::object)
+        if (tmplSchema.getDataKind() == DataKind::object
+            or tmplSchema.getDataKind() == DataKind::union_)
         {
             instSchema["additionalProperties"] = false;
         }
@@ -245,9 +257,6 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         delete adapter; // NOLINT
     }
 
-    static char const* sceneSchemaPath = "WildPipeline/Schema/Scene-schema.json";
-    static char const* entitySchemaPath = "WildPipeline/Schema/Entity-schema.json";
-
     static std::string createMessageFromValidationResult(valijson::ValidationResults const& _result)
     {
         std::string fullMessage;
@@ -284,8 +293,6 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         // valid the scene using schema
         strcpy_s(
             schemaPath, sizeof(schemaPath), (_toolsDir / "WildPipeline/Schema").u8string().c_str());
-
-        json schemaDocument = loadJsonFile(_toolsDir, entitySchemaPath);
 
         json fullSceneInstanceSchema = createValidationSchema(_schema);
         fullSceneInstanceSchema["$ref"] = std::string("#/definitions/") + rootName;

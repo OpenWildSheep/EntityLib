@@ -98,7 +98,8 @@ namespace Ent
             _pop();
             return false;
         }
-        void outObjectField([[maybe_unused]] Property const& m_source, [[maybe_unused]] char const* _key) override
+        void outObjectField(
+            [[maybe_unused]] Property const& m_source, [[maybe_unused]] char const* _key) override
         {
             _pop();
         }
@@ -195,16 +196,16 @@ namespace Ent
         {
             if (m_overrideValueSource == OverrideValueSource::Override)
             {
-                switch (m_source.getMapKeyType())
+                switch (m_source.getMapKeyKind())
                 {
-                case DataType::integer:
+                case DataKind::integer:
                     for (auto const& removed : m_source.getMapRemovedKeysInt())
                     {
                         _back().eraseMapItem(removed);
                     }
                     break;
-                case DataType::string: [[fallthrough]];
-                case DataType::entityRef:
+                case DataKind::string: [[fallthrough]];
+                case DataKind::entityRef:
                     for (auto const& removed : m_source.getMapRemovedKeysString())
                     {
                         _back().eraseMapItem(removed);
@@ -218,16 +219,16 @@ namespace Ent
         {
             if (m_overrideValueSource == OverrideValueSource::Override)
             {
-                switch (m_source.getObjectSetKeyType())
+                switch (m_source.getObjectSetKeyKind())
                 {
-                case DataType::integer:
+                case DataKind::integer:
                     for (auto const& removed : m_source.getObjectSetRemovedKeysInt())
                     {
                         _back().eraseObjectSetItem(removed);
                     }
                     break;
-                case DataType::string: [[fallthrough]];
-                case DataType::entityRef:
+                case DataKind::string: [[fallthrough]];
+                case DataKind::entityRef:
                     for (auto const& removed : m_source.getObjectSetRemovedKeysString())
                     {
                         _back().eraseObjectSetItem(removed);

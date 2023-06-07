@@ -205,10 +205,6 @@ namespace Ent
         {
             return getPimpl().getUnionTypeIndex();
         }
-        [[nodiscard]] DataType getDataType() const ///< Get the DataType of a Property
-        {
-            return getPimpl().getDataType();
-        }
         [[nodiscard]] Subschema const* getSchema() const ///< Get the Schema of the current Property
         {
             return getPimpl().getSchema();
@@ -218,18 +214,18 @@ namespace Ent
             return getPimpl().getTypeName();
         }
 
-        [[nodiscard]] DataType getMapKeyType() const ///< @pre Map @brief Get the key type current Map
+        [[nodiscard]] DataKind getMapKeyKind() const ///< @pre Map @brief Get the key type current Map
         {
-            return getPimpl().getMapKeyType();
+            return getPimpl().getMapKeyKind();
         }
-        [[nodiscard]] DataType
-        getObjectSetKeyType() const ///< @pre ObjectSet @brief Get the key type current ObjectSet
+        [[nodiscard]] DataKind
+        getObjectSetKeyKind() const ///< @pre ObjectSet @brief Get the key type current ObjectSet
         {
-            return getPimpl().getObjectSetKeyType();
+            return getPimpl().getObjectSetKeyKind();
         }
-        [[nodiscard]] DataType getPrimSetKeyType() const ///< @pre PrimitiveSet @brief Get the key type Set
+        [[nodiscard]] DataKind getPrimSetKeyKind() const ///< @pre PrimitiveSet @brief Get the key type Set
         {
-            return getPimpl().getPrimSetKeyType();
+            return getPimpl().getPrimSetKeyKind();
         }
         [[nodiscard]] size_t size() const ///< @return the size the this Property whatever it is.
         {
@@ -735,7 +731,7 @@ namespace Ent
         }
 
         [[nodiscard]] std::vector<char const*>
-        getFieldNames() const ///< @pre type==Ent::DataType::object @brief Get all field names
+        getFieldNames() const ///< @pre getDataKind()==Ent::DataKind::object @brief Get all field names
         {
             return m_self->getFieldNames();
         }

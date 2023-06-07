@@ -43,7 +43,18 @@ try
     system(editCmd);
 
     // Generate schema files (MergedComponents.json, TextEditorsSchema.json and all single schema files)
-    Ent::updateComponents(argv[1]);
+    path const toolsPath = argv[1];
+    std::vector<Ent::SchemaInput> schemaFiles = {
+        {toolsPath / "WildPipeline/Schema/RuntimeComponents.json", Ent::SchemaSource::Runtime},
+        {toolsPath / "WildPipeline/Schema/EditionComponents.json", Ent::SchemaSource::Edition},
+        {toolsPath / "WildPipeline/Schema/Scene-schema.json", Ent::SchemaSource::Edition},
+    };
+
+    Ent::updateSchemas(
+        argv[1],
+        toolsPath / "WildPipeline/Schema/Dependencies.json",
+        schemaFiles,
+        toolsPath / "WildPipeline/Schema");
 
     // Make the list of files to restore and files to add
     auto fileToRestorePath = temp_directory_path() / "tempRestoreFileList.txt";

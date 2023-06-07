@@ -26,7 +26,7 @@
 
 namespace Ent
 {
-    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
+    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataKind
     struct JsonValidation : std::runtime_error
     {
         /// Make a JsonValidation with the given _message
@@ -398,7 +398,7 @@ namespace Ent
         explicit Exception(char const* _message = nullptr); ///< ctor
     };
 
-    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataType
+    /// Exception thrown when calling a method of a Node which has not the apropriate Ent::DataKind
     struct BadType : ContextException
     {
         explicit BadType(char const* _message = nullptr); ///< ctor

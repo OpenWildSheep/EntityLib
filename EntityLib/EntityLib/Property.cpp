@@ -163,15 +163,15 @@ namespace Ent
     std::vector<Property> Property::getObjectSetItems() const
     {
         std::vector<Property> result;
-        auto const keyType = getPimpl().getObjectSetKeyType();
-        if (keyType == DataType::string or keyType == DataType::entityRef)
+        auto const keyKind = getPimpl().getObjectSetKeyKind();
+        if (keyKind == DataKind::string or keyKind == DataKind::entityRef)
         {
             for (char const* key : getPimpl().getObjectSetKeysString())
             {
                 result.emplace_back(getPimpl().getObjectSetItem(key));
             }
         }
-        else if (keyType == DataType::integer)
+        else if (keyKind == DataKind::integer)
         {
             for (auto const key : getPimpl().getObjectSetKeysInt())
             {
@@ -245,6 +245,7 @@ namespace Ent
             return staticFormat(
                 R"("%s" - "%s")", bestPrefabInfo->prefabPath.c_str(), bestPrefabInfo->nodeRef.c_str());
         }
-        return staticFormat(R"("%s" - "%s")", histories[0].prefabPath.c_str(), histories[0].nodeRef.c_str());
+        return staticFormat(
+            R"("%s" - "%s")", histories[0].prefabPath.c_str(), histories[0].nodeRef.c_str());
     }
 } // namespace Ent

@@ -61,23 +61,16 @@ namespace Ent
         return c.make_preferred();
     }
 
-    EntityLib::EntityLib(std::filesystem::path const& _rootPath, bool _doMergeComponents)
-        : rootPath(very_weakly_canonical(_rootPath)) // Read schema and dependencies
+    EntityLib::EntityLib(
+        std::filesystem::path const& _rawdataPath, std::filesystem::path const& _schemaPath)
     {
-        rawdataPath = getAbsolutePath(rootPath / "RawData");
-        toolsDir = getAbsolutePath(rootPath / "Tools");
-        auto schemaPath = toolsDir / "WildPipeline/Schema";
+        rawdataPath = getAbsolutePath(_rawdataPath);
+        auto toolsDir = getAbsolutePath(rootPath / "Tools");
+        auto schemaPath = getAbsolutePath(_schemaPath);
 
-        SchemaLoader loader(toolsDir, schemaPath);
+        SchemaLoader loader(schemaPath);
 
-        if (_doMergeComponents)
-        {
-            // mergeComponents create the content of the "MergedComponents.json" file
-            json mergedComps = mergeComponents(toolsDir);
-            loader.addInCache("MergedComponents.json", std::move(mergedComps));
-        }
-
-        json schemaDocument = loadJsonFile(toolsDir, "WildPipeline/Schema/MergedComponents.json");
+        json schemaDocument = loadJsonFile("", schemaPath / "MergedComponents.json");
 
         loader.readSchema(&schema.schema, "MergedComponents.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
@@ -105,7 +98,7 @@ namespace Ent
         }
 
         static std::string const wildComponentNameSuffix = "GD";
-        json dependencies = loadJsonFile(toolsDir, "WildPipeline/Schema/Dependencies.json");
+        json dependencies = loadJsonFile("", schemaPath / "Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>() + wildComponentNameSuffix;
@@ -140,53 +133,23 @@ namespace Ent
         }
         return nullptr;
     }
-
-    template <typename N> // N : Node or Node const
-    static N* getSceneParentEntity(N* _scene)
-    {
-        N* entity = nullptr;
-        ENTLIB_ASSERT(_scene != nullptr);
-        ENTLIB_ASSERT(_scene->getDataType() == DataType::array);
-        // subSceneData can be null if rootScene was loaded with loadSceneAsNode
-        if (auto* subSceneData = _scene->getParentNode())
-        {
-            ENTLIB_ASSERT(subSceneData != nullptr);
-            ENTLIB_ASSERT(subSceneData->getDataType() == DataType::object);
-            auto* subSceneCpnt = subSceneData->getParentNode(); // SubScene
-            ENTLIB_ASSERT(subSceneCpnt != nullptr);
-            ENTLIB_ASSERT(subSceneCpnt->getDataType() == DataType::object);
-            auto* cpntUnion = subSceneCpnt->getParentNode(); // Component union
-            ENTLIB_ASSERT(cpntUnion != nullptr);
-            ENTLIB_ASSERT(cpntUnion->getDataType() == DataType::oneOf);
-            auto* components = cpntUnion->getParentNode(); // "Components" property (array)
-            ENTLIB_ASSERT(components != nullptr);
-            ENTLIB_ASSERT(components->getDataType() == DataType::array);
-            entity = components->getParentNode(); // Entity
-            ENTLIB_ASSERT(entity != nullptr);
-            ENTLIB_ASSERT(entity->getDataType() == DataType::object);
-            ENTLIB_ASSERT_MSG(
-                entity == nullptr || entity->getSchema()->name == entitySchemaName,
-                "current has to be an Entity but is not!");
-        }
-        return entity;
-    }
-
+    
     static PropImplPtr getSceneParentEntity(PropImpl* _scene)
     {
         PropImplPtr entity;
         ENTLIB_ASSERT(_scene != nullptr);
-        ENTLIB_ASSERT(_scene->getDataType() == DataType::array);
+        ENTLIB_ASSERT(_scene->getDataKind() == DataKind::objectSet);
         // subSceneData can be null if rootScene was loaded with loadSceneAsNode
         if (auto const subSceneCpnt = _scene->getParent())
         {
             ENTLIB_ASSERT(subSceneCpnt != nullptr);
-            ENTLIB_ASSERT(subSceneCpnt->getDataType() == DataType::object);
+            ENTLIB_ASSERT(subSceneCpnt->getDataKind() == DataKind::object);
             auto const components = subSceneCpnt->getParent(); // Component union
             ENTLIB_ASSERT(components != nullptr);
-            ENTLIB_ASSERT(components->getDataType() == DataType::array);
+            ENTLIB_ASSERT(components->getDataKind() == DataKind::unionSet);
             entity = components->getParent(); // Entity
             ENTLIB_ASSERT(entity != nullptr);
-            ENTLIB_ASSERT(entity->getDataType() == DataType::object);
+            ENTLIB_ASSERT(entity->getDataKind() == DataKind::object);
             ENTLIB_ASSERT_MSG(
                 entity == nullptr || entity->getSchema()->name == entitySchemaName,
                 "current has to be an Entity but is not!");
@@ -305,7 +268,7 @@ namespace Ent
         std::vector<std::string> path;
         while (current != nullptr)
         {
-            ENTLIB_ASSERT(current->getDataType() == DataType::object);
+            ENTLIB_ASSERT(current->getDataKind() == DataKind::object);
             path.emplace_back(current->getObjectField("Name")->getString());
             rootScene = current->getParent();
             rootEntity = std::move(current);
@@ -324,7 +287,7 @@ namespace Ent
     std::optional<Property>
     EntityLib::resolveEntityRef(Property const& _node, EntityRef const& _entityRef) const
     {
-        if (_node.getDataType() == DataType::array) // This is a scene
+        if (_node.getDataKind() == DataKind::objectSet) // This is a scene
         {
             if (_entityRef.entityPath.empty())
             {
@@ -352,6 +315,7 @@ namespace Ent
         }
         return std::nullopt;
     }
+
     EntityRef EntityLib::makeEntityRef(Property const& _from, Property const& _to) const
     {
         // get the two absolute path
@@ -624,76 +588,6 @@ namespace Ent
     {
         UnsupportedFormat() = default;
     };
-
-    template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
-    std::shared_ptr<Type const> EntityLib::loadEntityOrScene(
-        std::filesystem::path const& _path,
-        Cache& cache,
-        ValidateFunc&& validate,
-        LoadFunc&& load,
-        Type const* _super) const
-    {
-        auto const absPath = getAbsolutePath(_path);
-        std::filesystem::path relPath = relative(absPath, rawdataPath);
-        if (relPath.empty() || (*relPath.begin() == ".."))
-        {
-            relPath = absPath;
-        }
-        bool reload = false;
-        auto error = std::error_code{};
-        auto timestamp = last_write_time(absPath, error);
-        if (error)
-        {
-            if (m_fallbackEntity.empty())
-            {
-                throw FileSystemError("Trying to get last write time", rawdataPath, relPath, error);
-            }
-            else
-            {
-                relPath = m_fallbackEntity.c_str();
-            }
-        }
-        auto iter = cache.find(relPath);
-        if (iter == cache.end())
-        {
-            reload = true;
-        }
-        else
-        {
-            if (timestamp > iter->second.time)
-            {
-                reload = true;
-            }
-        }
-
-        if (reload)
-        {
-            try
-            {
-                json document = loadJsonFile(rawdataPath, relPath);
-                if (validationEnabled)
-                {
-                    validate(schema.schema, toolsDir, document);
-                }
-
-                auto entity = load(*this, document, _super);
-                auto file = typename Cache::mapped_type{std::move(entity), timestamp};
-                auto [newiter, inserted] = cache.insert_or_assign(relPath, std::move(file));
-                return newiter->second.data;
-            }
-            catch (ContextException& ex)
-            {
-                ex.addContextMessage("loading : %s", formatPath(rawdataPath, relPath));
-                throw;
-            }
-            catch (...)
-            {
-                throw WrapperException(
-                    std::current_exception(), "loading : %s", formatPath(rawdataPath, relPath));
-            }
-        }
-        return iter->second.data;
-    }
 
     PropImplPtr EntityLib::newPropImpl()
     {

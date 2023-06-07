@@ -22,18 +22,17 @@ using Value = std::variant<Null, std::string, double, int64_t, bool, EntityRef>;
 
 Value getPropValue(Property const& _prop)
 {
-    switch (_prop.getDataType())
+    switch (_prop.getDataKind())
     {
-    case DataType::array:
-    case DataType::object:
-    case DataType::oneOf:
-    case DataType::null: return nullptr;
-    case DataType::boolean: return _prop.getBool();
-    case DataType::integer: return _prop.getInt();
-    case DataType::number: return _prop.getFloat();
-    case DataType::string: return std::string(_prop.getString());
-    case DataType::entityRef: return _prop.getEntityRef();
-    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
+    case DataKind::array:
+    case DataKind::object:
+    case DataKind::union_:
+    case DataKind::boolean: return _prop.getBool();
+    case DataKind::integer: return _prop.getInt();
+    case DataKind::number: return _prop.getFloat();
+    case DataKind::string: return std::string(_prop.getString());
+    case DataKind::entityRef: return _prop.getEntityRef();
+    case DataKind::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
     return {};
 }
@@ -87,33 +86,32 @@ struct GetValue
 
 void setPropValue(Property& node, Value const& val)
 {
-    switch (node.getDataType())
+    switch (node.getDataKind())
     {
-    case DataType::array:
-    case DataType::object:
-    case DataType::oneOf:
-    case DataType::null: break;
-    case DataType::boolean: node.setBool(std::visit(GetValue<bool>{}, val)); break;
-    case DataType::integer: node.setInt(std::visit(GetValue<int64_t>{}, val)); break;
-    case DataType::number: node.setFloat(std::visit(GetValue<double>{}, val)); break;
-    case DataType::string: node.setString(std::visit(GetValue<std::string>{}, val).c_str()); break;
-    case DataType::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
-    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
+    case DataKind::array:
+    case DataKind::object:
+    case DataKind::union_:
+    case DataKind::boolean: node.setBool(std::visit(GetValue<bool>{}, val)); break;
+    case DataKind::integer: node.setInt(std::visit(GetValue<int64_t>{}, val)); break;
+    case DataKind::number: node.setFloat(std::visit(GetValue<double>{}, val)); break;
+    case DataKind::string: node.setString(std::visit(GetValue<std::string>{}, val).c_str()); break;
+    case DataKind::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
+    case DataKind::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }
 
 static py::list propMapGetKeys(Property& _prop)
 {
-    auto const type = _prop.getMapKeyType();
+    auto const kind = _prop.getMapKeyKind();
     py::list arr;
-    if (type == DataType::string || type == DataType::entityRef)
+    if (kind == DataKind::string || kind == DataKind::entityRef)
     {
         for (auto const& key : _prop.getMapKeysString())
         {
             arr.append(py::str(key));
         }
     }
-    else if (type == DataType::integer)
+    else if (kind == DataKind::integer)
     {
         for (auto key : _prop.getMapKeysInt())
         {
@@ -129,16 +127,16 @@ static py::list propMapGetKeys(Property& _prop)
 
 static py::list propMapGetItems(Property& _prop)
 {
-    auto const type = _prop.getMapKeyType();
+    auto const kind = _prop.getMapKeyKind();
     py::list arr;
-    if (type == DataType::string || type == DataType::entityRef)
+    if (kind == DataKind::string || kind == DataKind::entityRef)
     {
         for (auto&& [key, value] : _prop.getMapStringItems())
         {
             arr.append(make_tuple(py::str(key), py::cast(value)));
         }
     }
-    else if (type == DataType::integer)
+    else if (kind == DataKind::integer)
     {
         for (auto&& [key, value] : _prop.getMapIntItems())
         {
@@ -158,16 +156,16 @@ static py::list propPrimSetGetKeys(Property& _prop)
     {
         throw std::runtime_error("Not an primitiveSet in 'primset_keys'");
     }
-    auto const& type = _prop.getSchema()->singularItems->get().type;
+    auto const& kind = _prop.getSchema()->singularItems->get().getDataKind();
     py::list arr;
-    if (type == DataType::string || type == DataType::entityRef)
+    if (kind == DataKind::string || kind == DataKind::entityRef)
     {
         for (auto const& key : _prop.getPrimSetKeysString())
         {
             arr.append(py::str(key));
         }
     }
-    else if (type == DataType::integer)
+    else if (kind == DataKind::integer)
     {
         for (auto key : _prop.getPrimSetKeysInt())
         {
@@ -189,16 +187,16 @@ static py::list propObjSetGetKeys(Property& _prop)
     }
     auto& itemType = _prop.getSchema()->singularItems->get();
     auto const meta = std::get<Subschema::ArrayMeta>(_prop.getSchema()->meta);
-    auto const type = itemType.properties.at(*meta.keyField).get().type;
+    auto const type = itemType.properties.at(*meta.keyField).get().getDataKind();
     py::list arr;
-    if (type == DataType::string || type == DataType::entityRef)
+    if (type == DataKind::string || type == DataKind::entityRef)
     {
         for (auto const& key : _prop.getObjectSetKeysString())
         {
             arr.append(py::str(key));
         }
     }
-    else if (type == DataType::integer)
+    else if (type == DataKind::integer)
     {
         for (auto key : _prop.getObjectSetKeysInt())
         {
@@ -253,7 +251,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
      * NOTE: it wasn't strictly to pre-declare ALL classes to fix the issues we currently had,
      * but it just seemed safer in case we add new methods with new dependencies.
      */
-    auto pyDataType = py::enum_<DataType>(ent, "DataType");
+    auto pyJsonType = py::enum_<JsonType>(ent, "JsonType");
     auto pyDataKind = py::enum_<DataKind>(ent, "DataKind");
     auto pyLogicErrorPolicy = py::enum_<LogicErrorPolicy>(ent, "LogicErrorPolicy");
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
@@ -276,16 +274,16 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .value("Throw", LogicErrorPolicy::Throw)
         .export_values();
 
-    pyDataType
-        .value("null", DataType::null)
-        .value("string", DataType::string)
-        .value("number", DataType::number)
-        .value("integer", DataType::integer)
-        .value("object", DataType::object)
-        .value("array", DataType::array)
-        .value("boolean", DataType::boolean)
-        .value("entityRef", DataType::entityRef)
-        .value("union", DataType::oneOf)
+    pyJsonType
+        .value("null", JsonType::null)
+        .value("string", JsonType::string)
+        .value("number", JsonType::number)
+        .value("integer", JsonType::integer)
+        .value("object", JsonType::object)
+        .value("array", JsonType::array)
+        .value("boolean", JsonType::boolean)
+        .value("entityRef", JsonType::entityRef)
+        .value("union", JsonType::oneOf)
         .export_values();
 
     pyDataKind
@@ -350,7 +348,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("index", &Subschema::UnionSubTypeInfo::index);
 
     pySubschema
-        .def_readonly("type", &Subschema::type)
+        .def_readonly("json_type", &Subschema::jsonType)
         .def_readonly("name", &Subschema::name)
         .def_readonly("title", &Subschema::title)
         .def_readonly("description", &Subschema::description)
@@ -446,14 +444,13 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def(py::init<uint8_t, uint8_t, uint8_t, uint8_t>());
 
     pyEntityLib
-        .def(py::init<std::string>())
+        .def(py::init<std::string, std::string>(), "rawdata_path"_a, "schemas_path"_a)
         // this is for exchanging pointers between different wrappers (eg C++ vs Python), only works in the same process, use at your own risk
         .def("get_ptr", [](EntityLib* self) {return (intptr_t)self;})
         .def_static("from_ptr", [](intptr_t _ptr) {return (EntityLib*)_ptr;}, py::return_value_policy::reference_internal)
         .def_readwrite("validation_enabled", &EntityLib::validationEnabled)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
-        .def_readonly("tools_dir", &EntityLib::toolsDir)
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
         .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Property const&, Property const&) const>(&EntityLib::makeEntityRef))
         .def("resolve_entityref",
@@ -527,12 +524,12 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_property("instance_of", &Property::getInstanceOf, &Property::changeInstanceOf)
         .def_property_readonly("first_instance_of", &Property::getFirstInstanceOf)
         .def_property_readonly("union_type", &Property::getUnionType) // or read/write ?
-        .def_property_readonly("data_type", &Property::getDataType)
+        .def_property_readonly("data_kind", &Property::getDataKind)
         .def_property_readonly("schema", &Property::getSchema, py::return_value_policy::reference_internal)
         .def_property_readonly("type_name", &Property::getTypeName)
-        .def_property_readonly("map_key_type", &Property::getMapKeyType)
-        .def_property_readonly("objectset_key_type", &Property::getObjectSetKeyType)
-        .def_property_readonly("primset_key_type", &Property::getPrimSetKeyType)
+        .def_property_readonly("map_key_kind", &Property::getMapKeyKind)
+        .def_property_readonly("objectset_key_kind", &Property::getObjectSetKeyKind)
+        .def_property_readonly("primset_key_kind", &Property::getPrimSetKeyKind)
         .def_property("size", &Property::size, &Property::setSize)
         .def("contains", &Property::contains)
         .def_property_readonly("array_size", &Property::arraySize)

@@ -21,97 +21,6 @@ namespace Ent
 
 using namespace Ent;
 
-static void printNode(char const* name, Property const& node, std::string const& tab)
-{
-    using namespace Ent;
-    switch (node.getDataType())
-    {
-    case DataType::null: printfmt("%s%s [null]\n", tab.c_str(), name); break;
-    case DataType::string:
-        printfmt("%s%s [string] : %s\n", tab.c_str(), name, node.getString());
-        break;
-    case DataType::number:
-        printfmt("%s%s [number] : %f\n", tab.c_str(), name, node.getFloat());
-        break;
-    case DataType::integer:
-        printfmt("%s%s [integer] : %lld\n", tab.c_str(), name, node.getInt());
-        break;
-    case DataType::object:
-        printfmt("%s%s [object]\n", tab.c_str(), name);
-        for (char const* field : node.getFieldNames())
-        {
-            // printfmt("%s  \"%s\"\n", tab.c_str(), field);
-            auto sub = node.getObjectField(field);
-            printNode(field, sub, tab + "    ");
-        }
-        break;
-    case DataType::array:
-        printfmt("%s%s [array]\n", tab.c_str(), name);
-        for (size_t i = 0; i < node.size(); ++i)
-        {
-            std::stringstream ss;
-            ss << i;
-            printNode(ss.str().c_str(), node.getArrayItem(i), tab + "    ");
-        }
-        break;
-    case DataType::boolean:
-        printfmt("%s%s [boolean] : %s\n", tab.c_str(), name, node.getBool() ? "true" : "false");
-        break;
-    case DataType::entityRef:
-        printfmt(
-            "%s%s [EntityRef] : %s\n", tab.c_str(), name, node.getEntityRef().entityPath.c_str());
-        break;
-    case DataType::oneOf:
-        printfmt("%s%s [Union]\n", tab.c_str(), name);
-        printNode("Data", node.getUnionData(), tab + "    ");
-        break;
-    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
-    }
-}
-
-static void
-displaySubSchema(std::string const& name, Subschema const& subschema, std::string const& indent)
-{
-    if (size(indent) > 80)
-    {
-        return;
-    }
-    printfmt("%s%s : ", indent.c_str(), name.c_str());
-    switch (subschema.type)
-    {
-    case DataType::array:
-        printfmt("array\n");
-        if (subschema.minItems != 0)
-        {
-            printfmt("%s  minItems:%d\n", indent.c_str(), subschema.minItems);
-        }
-        if (subschema.maxItems != static_cast<size_t>(-1))
-        {
-            printfmt("%s  maxItems:%d\n", indent.c_str(), subschema.maxItems);
-        }
-        if (subschema.singularItems != nullptr)
-        {
-            displaySubSchema("items", subschema.singularItems->get(), indent + "  ");
-        }
-        break;
-    case DataType::boolean: printfmt("boolean\n"); break;
-    case DataType::integer: printfmt("integer\n"); break;
-    case DataType::null: printfmt("null\n"); break;
-    case DataType::number: printfmt("number\n"); break;
-    case DataType::object:
-        printfmt("object\n");
-        for (auto&& [propname, sub] : subschema.properties)
-        {
-            displaySubSchema(propname, *sub, indent + "  ");
-        }
-        break;
-    case DataType::string: printfmt("string\n"); break;
-    case DataType::entityRef: printfmt("entity ref\n"); break;
-    case DataType::oneOf: printfmt("oneOf\n"); break;
-    case DataType::COUNT: ENTLIB_LOGIC_ERROR("Invalid DataType when parsing meta"); break;
-    }
-}
-
 // NOLINTNEXTLINE
 #define ENTLIB_CHECK_EXCEPTION(expression, excep_type)                                             \
     {                                                                                              \
@@ -144,34 +53,15 @@ int main(int argc, char** argv)
 try
 {
     SetConsoleOutputCP(65001);
-    bool doDisplayScene = false;
-    bool doDisplaySubSchema = false;
-    bool dumpNodes = false;
     bool doTestRawData = false;
     std::filesystem::path rootPath = "X:";
     for (int i = 1; i < argc; ++i)
     {
-        if (strcmp(argv[i], "--displaySchema") == 0)
-        {
-            doDisplaySubSchema = true;
-        }
-        else if (strcmp(argv[i], "--displayScene") == 0)
-        {
-            doDisplayScene = true;
-        }
-        else if (strcmp(argv[i], "--dumpNodes") == 0)
-        {
-            dumpNodes = true;
-        }
-        else if (strcmp(argv[i], "--rootPath") == 0)
+        if (strcmp(argv[i], "--rootPath") == 0)
         {
             ++i;
             ENTLIB_ASSERT(i < argc);
             rootPath = argv[i];
-            if (rootPath.native().back() != L'/' || rootPath.native().back() != L'\\')
-            {
-                rootPath = (rootPath.native() + L'/');
-            }
         }
         else if (strcmp(argv[i], "--test-raw_data") == 0)
         {
@@ -179,16 +69,13 @@ try
         }
     }
 
+    if (rootPath.native().back() != L'/' || rootPath.native().back() != L'\\')
+    {
+        rootPath = (rootPath.native() + L'/');
+    }
     std::filesystem::path rawdataPath = rootPath / "RawData";
 
-    // Ent::updateComponents("X:/Tools");
-#ifdef _DEBUG
-    bool const doMergeComponents = false;
-#else
-    bool const doMergeComponents = true;
-#endif
-
-    EntityLib entlib(rootPath, doMergeComponents);
+    EntityLib entlib(rawdataPath, rootPath / "Tools/WildPipeline/Schema");
     using namespace std::filesystem;
 
     entlib.setLogicErrorPolicy(LogicErrorPolicy::Throw);
@@ -494,7 +381,7 @@ try
     {
         // ActorStates
         auto actorStates = ent.ActorStates();
-        ENTLIB_ASSERT(actorStates.getProperty().getDataType() == Ent::DataType::array);
+        ENTLIB_ASSERT(actorStates.getProperty().getDataKind() == Ent::DataKind::unionSet);
         ENTLIB_ASSERT(actorStates.size() == 2);
         auto actorState = actorStates.ActorStateHoldingItem();
         ENTLIB_ASSERT(actorState.has_value());
@@ -517,7 +404,7 @@ try
         // Test get on map and set
         ENTLIB_ASSERT(tags.get("a")->count("1"));
 
-        ENTLIB_ASSERT(tags.getProperty().getMapKeyType() == Ent::DataType::string);
+        ENTLIB_ASSERT(tags.getProperty().getMapKeyKind() == Ent::DataKind::string);
         auto keys = tags.getKeys();
         ENTLIB_ASSERT(keys.size() == 3);
         for (auto&& k : keys)
@@ -951,7 +838,7 @@ try
     {
         // ActorStates
         auto actorStates = ent.ActorStates();
-        ENTLIB_ASSERT(actorStates.getDataType() == Ent::DataType::array);
+        ENTLIB_ASSERT(actorStates.getDataKind() == Ent::DataKind::unionSet);
         ENTLIB_ASSERT(actorStates.size() == 3);
         auto climbEdge = actorStates.ActorStateHoldingItem();
         ENTLIB_ASSERT(climbEdge.has_value());
@@ -1253,7 +1140,7 @@ try
         {
             mapTest = setOfObject->MapOfObject();
             auto newNode2 = mapTest.add("NewNode2");
-            ENTLIB_ASSERT(newNode2.getDataType() == Ent::DataType::object);
+            ENTLIB_ASSERT(newNode2.getDataKind() == Ent::DataKind::object);
         }
 
         sysCreat->BehaviorState().set("Overrided");
@@ -1303,7 +1190,7 @@ try
         // Test insert in map (+save/load)
         auto const e = tags.get("A");
         ENTLIB_ASSERT(e.has_value());
-        ENTLIB_ASSERT(e->getDataType() == Ent::DataType::array);
+        ENTLIB_ASSERT(e->getDataKind() == Ent::DataKind::primitiveSet);
 
         // Test erase in union_set (+save/load)
         ENTLIB_ASSERT(actorStates.get("EntityStatePlayer").has_value() == false);
@@ -1659,16 +1546,7 @@ try
         instanceOf.save("setInstanceOf.entity");
     }
     testCreateInstanceOf("setInstanceOf.entity");
-
-    // ******************************** Test iteration of schema **********************************
-    if (doDisplaySubSchema)
-    {
-        for (auto&& [name, sub] : entlib.schema.components)
-        {
-            displaySubSchema(name, *sub, {});
-        }
-    }
-
+    
     // ******************* Test load/save complex entity pinetreec50cmh5mbasic ********************
     {
         auto ent = Gen::Entity::loadCopy(entlib, "pinetreec50cmh5mbasic.entity");
@@ -1785,25 +1663,7 @@ try
         auto scene = sceneent.Components().SubScene()->Embedded();
 
         ENTLIB_LOG("Done");
-
-        if (doDisplayScene)
-        {
-            using namespace Ent;
-            printfmt("Scene Loaded\n");
-            printfmt("Entity count : %zu\n", scene.size());
-
-            for (auto ent : scene)
-            {
-                printfmt("  Name \"%s\"\n", ent.Name());
-
-                for (auto comp : ent.Components())
-                {
-                    printfmt("    Type \"%s\"\n", comp.getDataType());
-                    printNode("", comp.getUnionData(), "      ");
-                }
-            }
-        }
-
+        
         auto heightObj = scene.begin()->Components().addHeightObj();
         heightObj.DisplaceNoiseList().push();
 

@@ -107,7 +107,8 @@ namespace Ent
     {
         FileProperty newLayer(*m_entityLib, m_docMetaData);
         ENTLIB_DBG_ASSERT(
-            m_schema.base->type == DataType::object or m_schema.base->type == DataType::oneOf);
+            m_schema.base->getDataKind() == DataKind::object
+            or m_schema.base->getDataKind() == DataKind::union_);
         if (_fieldRef == nullptr)
         {
             auto const& properties = m_schema.base->properties;
@@ -207,7 +208,7 @@ namespace Ent
     {
         FileProperty newLayer(*m_entityLib, m_docMetaData);
         auto const& setSchema = *m_schema.base;
-        ENTLIB_ASSERT(setSchema.type == DataType::array);
+        ENTLIB_ASSERT(setSchema.getDataKind() == DataKind::objectSet);
         auto const& objectSchema = setSchema.singularItems->get();
         char const* keyFieldName = nullptr;
         MapItemAction itemAction = MapItemAction::None;
@@ -326,7 +327,13 @@ namespace Ent
     FileProperty FileProperty::getArrayItem(size_t _index) const
     {
         FileProperty newLayer(*m_entityLib, m_docMetaData);
-        ENTLIB_DBG_ASSERT(m_schema.base->type == DataType::array);
+        // TODO : this function should not be used for anything else than arrays - we cheat here by accessing set items by index
+        ENTLIB_DBG_ASSERT(
+            m_schema.base->getDataKind() == DataKind::array
+            or m_schema.base->getDataKind() == DataKind::unionSet
+            or m_schema.base->getDataKind() == DataKind::objectSet
+            or m_schema.base->getDataKind() == DataKind::map
+            or m_schema.base->getDataKind() == DataKind::primitiveSet);
         if (auto* const item = m_schema.base->singularItems.get())
         {
             auto const& subschema = item->get();
@@ -348,8 +355,8 @@ namespace Ent
             if (lastNode->size() > _index)
             {
                 auto* const newValue = &(*lastNode)[_index];
-                if (newLayer.m_schema.base->type == DataType::string
-                    or newLayer.m_schema.base->type == DataType::entityRef)
+                if (newLayer.m_schema.base->getDataKind() == DataKind::string
+                    or newLayer.m_schema.base->getDataKind() == DataKind::entityRef)
                 {
                     ENTLIB_DBG_ASSERT(newValue->is_string() or newValue->is_null());
                 }
@@ -399,7 +406,8 @@ namespace Ent
             if (auto const memiter = lastNode->find(dataField); memiter != lastNode->end())
             {
                 auto const* const unionValue = &(*memiter);
-                if (unionSchema->type == DataType::string or unionSchema->type == DataType::entityRef)
+                if (unionSchema->getDataKind() == DataKind::string
+                    or unionSchema->getDataKind() == DataKind::entityRef)
                 {
                     ENTLIB_DBG_ASSERT(unionValue->is_string());
                 }
@@ -435,8 +443,8 @@ namespace Ent
                     if (auto const memiter = lastNode->find(dataField); memiter != lastNode->end())
                     {
                         auto* const newValue = &(*memiter);
-                        if (unionSchema->type == DataType::string
-                            or unionSchema->type == DataType::entityRef)
+                        if (unionSchema->getDataKind() == DataKind::string
+                            or unionSchema->getDataKind() == DataKind::entityRef)
                         {
                             ENTLIB_DBG_ASSERT(newValue->is_string());
                         }
@@ -523,10 +531,10 @@ namespace Ent
                 (*_parent._getRawJsonMutable()) = json::array();
             }
             auto& keyType = itemType.linearItems->at(0).get();
-            switch (keyType.type)
+            switch (keyType.getDataKind())
             {
-            case DataType::entityRef: [[fallthrough]];
-            case DataType::string:
+            case DataKind::entityRef: [[fallthrough]];
+            case DataKind::string:
             {
                 auto const& key = std::get<std::string>(childName);
                 ENTLIB_ASSERT(keyType.enumValues.empty() or keyType.isValidEnumString(key));
@@ -539,7 +547,7 @@ namespace Ent
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
-            case DataType::integer:
+            case DataKind::integer:
             {
                 auto key = std::get<int64_t>(childName);
                 auto pairNode = json::array();
@@ -562,17 +570,17 @@ namespace Ent
                 (*_parent._getRawJsonMutable()) = json::array();
             }
             auto& itemType = parentSchema.singularItems->get();
-            switch (itemType.type)
+            switch (itemType.getDataKind())
             {
-            case DataType::integer: // integer set
+            case DataKind::integer: // integer set
             {
                 auto key = std::get<int64_t>(childName);
                 _parent._getRawJsonMutable()->push_back(key);
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
-            case DataType::entityRef: [[fallthrough]]; // entityRef set
-            case DataType::string: // String set
+            case DataKind::entityRef: [[fallthrough]]; // entityRef set
+            case DataKind::string: // String set
             {
                 auto const& key = std::get<std::string>(childName);
                 _parent._getRawJsonMutable()->push_back(key);
@@ -611,16 +619,16 @@ namespace Ent
             auto& itemType = parentSchema.singularItems->get();
             auto object = json::object();
             auto& keyFieldSchema = itemType.properties.at(*meta.keyField).get();
-            switch (keyFieldSchema.type)
+            switch (keyFieldSchema.getDataKind())
             {
-            case DataType::entityRef: [[fallthrough]];
-            case DataType::string:
+            case DataKind::entityRef: [[fallthrough]];
+            case DataKind::string:
             {
                 auto const& key = std::get<std::string>(childName);
                 object[*meta.keyField] = key;
                 break;
             }
-            case DataType::integer:
+            case DataKind::integer:
             {
                 auto key = std::get<int64_t>(childName);
                 object[*meta.keyField] = key;
@@ -657,13 +665,13 @@ namespace Ent
         case DataKind::integer: [[fallthrough]];
         case DataKind::boolean: [[fallthrough]];
         case DataKind::entityRef: [[fallthrough]];
-        case DataKind::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataType");
+        case DataKind::COUNT: ENTLIB_LOGIC_ERROR("Unexpected DataKind");
         }
         ENTLIB_ASSERT(newLayerJson != nullptr);
         _setRawJson(newLayerJson);
         if (_getRawJson()->is_null())
         {
-            if (getSchema()->type == DataType::array) // Replace "null" by [] for readability
+            if (getSchema()->jsonType == JsonType::array) // Replace "null" by [] for readability
             {
                 *_getRawJsonMutable() = json::array();
                 for (size_t i = 0; i < _prefabSize; ++i)
@@ -671,7 +679,7 @@ namespace Ent
                     _getRawJsonMutable()->emplace_back();
                 }
             }
-            else if (getSchema()->type == DataType::object) // Replace "null" by [] for readability
+            else if (getSchema()->jsonType == JsonType::object) // Replace "null" by [] for readability
             {
                 *_getRawJsonMutable() = json::object();
             }
@@ -1321,10 +1329,10 @@ namespace Ent
         {
             return;
         }
-        switch (getSchema()->type)
+        switch (getSchema()->getDataKind())
         {
-        case DataType::string: *_getRawJsonMutable() = std::string(); break;
-        case DataType::object:
+        case DataKind::string: *_getRawJsonMutable() = std::string(); break;
+        case DataKind::object:
         {
             json newObj = json::object();
             if (auto const* const arrayMeta = std::get_if<Subschema::ArrayMeta>(&_parentSchema->meta))
@@ -1340,14 +1348,17 @@ namespace Ent
             *_getRawJsonMutable() = json::object();
             break;
         }
-        case DataType::entityRef: *_getRawJsonMutable() = std::string(); break;
-        case DataType::array: *_getRawJsonMutable() = json::array(); break;
-        case DataType::boolean: *_getRawJsonMutable() = false; break;
-        case DataType::integer: *_getRawJsonMutable() = 0; break;
-        case DataType::null: *_getRawJsonMutable() = json(); break;
-        case DataType::number: *_getRawJsonMutable() = 0.; break;
-        case DataType::oneOf: *_getRawJsonMutable() = json::object(); break;
-        case DataType::COUNT:
+        case DataKind::entityRef: *_getRawJsonMutable() = std::string(); break;
+        case DataKind::array: [[fallthrough]];
+        case DataKind::unionSet: [[fallthrough]];
+        case DataKind::objectSet: [[fallthrough]];
+        case DataKind::map: [[fallthrough]];
+        case DataKind::primitiveSet: *_getRawJsonMutable() = json::array(); break;
+        case DataKind::boolean: *_getRawJsonMutable() = false; break;
+        case DataKind::integer: *_getRawJsonMutable() = 0; break;
+        case DataKind::number: *_getRawJsonMutable() = 0.; break;
+        case DataKind::union_: *_getRawJsonMutable() = json::object(); break;
+        case DataKind::COUNT:
         default: ENTLIB_LOGIC_ERROR("Unexpected schema type");
         }
         _increaseVersion();

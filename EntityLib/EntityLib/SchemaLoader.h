@@ -18,7 +18,7 @@ namespace Ent
     {
     public:
         /// Create a SchemaLoader given the file of the global Scene schema
-        SchemaLoader(std::filesystem::path _toolsdir, std::filesystem::path _schemaPath);
+        SchemaLoader(std::filesystem::path _schemaPath);
 
         /// Load the Schema of a Component or a property
         /// @remark _data can be a reference ($ref)
@@ -47,7 +47,7 @@ namespace Ent
             virtual void closeSingularItem() = 0;
             virtual void setMaxItems(size_t) = 0;
             virtual void setMinItems(size_t) = 0;
-            virtual void setType(DataType) = 0;
+            virtual void setJsonType(JsonType) = 0;
             virtual void addEnumValue(char const*) = 0;
             virtual void setDefaultValue(Subschema::DefaultValue) = 0;
             virtual void setMinimumValue(Subschema::DefaultValue) = 0;
@@ -94,7 +94,6 @@ namespace Ent
             int depth);
 
         std::filesystem::path m_schemaPath; ///< Path to the global Scene Schema
-        std::filesystem::path m_toolsdir; ///< Path to the X:/Tools directory
         std::map<std::string, nlohmann::json> m_schemaMap; ///< Cache of already loaded schema documents
         std::set<std::string> parsedRef; ///< To know if a definition was already parsed
     };

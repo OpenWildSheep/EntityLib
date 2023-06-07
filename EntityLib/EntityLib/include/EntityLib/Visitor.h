@@ -64,7 +64,7 @@ namespace Ent
         {
         }
         /// Called when entering in a Set of primitive
-        virtual void inPrimSet([[maybe_unused]] Property const& _prop, [[maybe_unused]] DataType _dataType)
+        virtual void inPrimSet([[maybe_unused]] Property const& _prop, [[maybe_unused]] DataKind _dataKind)
         {
         }
         /// Called when entering in the element of an array
@@ -134,10 +134,6 @@ namespace Ent
         virtual void outArray([[maybe_unused]] Property const& _prop)
         {
         }
-        /// Called when entered in a null Node
-        virtual void nullProperty([[maybe_unused]] Property const& _prop)
-        {
-        }
         /// Called when entered in a bool Node
         virtual void boolProperty([[maybe_unused]] Property const& _prop)
         {
@@ -189,7 +185,7 @@ namespace Ent
         {
         }
         /// The node is a set of primitive
-        virtual void inPrimSet([[maybe_unused]] DataType _dataType)
+        virtual void inPrimSet([[maybe_unused]] DataKind _dataKind)
         {
         }
         /// The node is a set of union
@@ -202,10 +198,6 @@ namespace Ent
         }
         /// The node is an array
         virtual void inArray()
-        {
-        }
-        /// The node has the type null
-        virtual void nullProperty()
         {
         }
         /// The node has the type bool

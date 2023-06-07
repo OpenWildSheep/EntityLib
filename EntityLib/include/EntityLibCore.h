@@ -11,7 +11,7 @@
 #include <filesystem>
 
 #pragma warning(push, 0)
-#include "../../../Core/WildShared/Exception.h"
+#include "../Exception.h"
 #pragma warning(pop)
 
 #ifdef ENTLIB_STATIC

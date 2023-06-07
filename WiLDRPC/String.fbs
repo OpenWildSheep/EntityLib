@@ -1,9 +1,0 @@
-
-namespace WildRPC;
-
-table String
-{
-	value:string;
-}
-
-root_type String;

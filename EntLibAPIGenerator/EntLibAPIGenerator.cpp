@@ -13,6 +13,7 @@
 #pragma warning(push, 0)
 #include <iostream>
 #include <mustache.hpp>
+#include <cxxopts.hpp>
 #include "../EntityLib/external/json.hpp"
 #pragma warning(pop)
 
@@ -1183,16 +1184,24 @@ std::set<std::string> getDependencies(std::map<std::string, json> const& nameToS
 int main(int argc, char* argv[])
 try
 {
-    if (argc < 4)
-    {
-        fprintf(stderr, "Missing resourcesPath and destinationPath, and p4_root arguments");
-        return EXIT_FAILURE;
-    }
-    auto resourcePath = path(argv[1]);
-    auto destinationPath = path(argv[2]);
-    auto p4path = path(argv[3]);
+    cxxopts::Options options(
+        "EntLibAPIGenerator", "Use schemas to generate strong typed API for C++ and python");
 
-    Ent::EntityLib entlib(p4path / "RawData", p4path / "Tools/WildPipeline/Schema");
+    options.add_options()(
+        "r,resources",
+        "Path to the 'resources' directory",
+        cxxopts::value<path>()->default_value("../EntLibAPIGenerator/resources"))(
+        "d,destination",
+        "Directory to output c++ and python classes",
+        cxxopts::value<path>()->default_value("EntGen"))(
+        "s,schemas", "Directory containing the schemas", cxxopts::value<path>());
+    auto result = options.parse(argc, argv);
+
+    auto resourcePath = result["resources"].as<path>();
+    auto destinationPath = result["destination"].as<path>();
+    auto schemaPath = result["schemas"].as<path>();
+
+    Ent::EntityLib entlib(current_path(), schemaPath);
 
     // Add all first-level definitions in the dist
     for (auto& [defName, def] : entlib.schema.schema.allDefinitions)

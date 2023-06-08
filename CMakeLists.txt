@@ -34,10 +34,12 @@ endif()
 target_include_directories(EntityLibPy PRIVATE ${PYTHON_INCLUDE_DIRS})
 target_link_libraries(EntityLibPy EntityLib)
 target_link_libraries(EntityLibPy ${PYTHON_LIBRARIES})
+set_target_properties(EntityLibPy PROPERTIES SUFFIX ".pyd")
 
 file(GLOB CLASSGEN_SOURCES "EntLibAPIGenerator/*.cpp")
 add_executable(EntLibAPIGenerator ${CLASSGEN_SOURCES})
 target_include_directories(EntLibAPIGenerator PRIVATE EntLibAPIGenerator/external/Mustache)
+# target_include_directories(EntLibAPIGenerator PRIVATE submodules/cxxopts/include)
 target_link_libraries(EntLibAPIGenerator EntityLib)
 
 file(GLOB TESTENTGEN_SOURCES "TestEntGen/*.cpp")

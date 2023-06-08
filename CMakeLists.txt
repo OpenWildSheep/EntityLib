@@ -54,4 +54,5 @@ target_link_libraries(TestEntityDLL EntityLib)
 
 file(GLOB UPDATESCHEMA_SOURCES "UpdateSchemas/*.cpp")
 add_executable(UpdateSchemas ${UPDATESCHEMA_SOURCES})
+target_include_directories(UpdateSchemas PRIVATE submodules/cxxopts/include)
 target_link_libraries(UpdateSchemas EntityLib)

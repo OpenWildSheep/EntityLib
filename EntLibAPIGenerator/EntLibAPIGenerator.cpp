@@ -1186,20 +1186,35 @@ try
 {
     cxxopts::Options options(
         "EntLibAPIGenerator", "Use schemas to generate strong typed API for C++ and python");
+    // clang-format off
+    options.add_options()
+        ("r,resources","Path to the 'resources' directory", cxxopts::value<path>()->default_value("../EntLibAPIGenerator/resources"))
+        ("d,destination","Directory to output c++ and python classes",cxxopts::value<path>()->default_value("EntGen"))
+        ("s,schemas", "Directory containing the schemas", cxxopts::value<path>())
+        ("h,help", "Print usage");
+    // clang-format on
 
-    options.add_options()(
-        "r,resources",
-        "Path to the 'resources' directory",
-        cxxopts::value<path>()->default_value("../EntLibAPIGenerator/resources"))(
-        "d,destination",
-        "Directory to output c++ and python classes",
-        cxxopts::value<path>()->default_value("EntGen"))(
-        "s,schemas", "Directory containing the schemas", cxxopts::value<path>());
-    auto result = options.parse(argc, argv);
+    path resourcePath, destinationPath, schemaPath;
 
-    auto resourcePath = result["resources"].as<path>();
-    auto destinationPath = result["destination"].as<path>();
-    auto schemaPath = result["schemas"].as<path>();
+    try
+    {
+        auto result = options.parse(argc, argv);
+        if (result.count("help"))
+        {
+            std::cout << options.help() << std::endl;
+            return EXIT_SUCCESS;
+        }
+
+        resourcePath = result["resources"].as<path>();
+        destinationPath = result["destination"].as<path>();
+        schemaPath = result["schemas"].as<path>();
+    }
+    catch (std::exception& ex)
+    {
+        std::cout << typeid(ex).name() << " - " << ex.what() << std::endl;
+        std::cout << options.help() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     Ent::EntityLib entlib(current_path(), schemaPath);
 

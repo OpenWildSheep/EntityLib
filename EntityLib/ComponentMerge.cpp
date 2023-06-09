@@ -80,11 +80,8 @@ namespace Ent
         return false;
     }
 
-    json mergeSchemas(
-        std::filesystem::path const& _dependencyPaths, std::vector<SchemaInput> const& _schemaInputs)
+    json mergeSchemas(std::vector<SchemaInput> const& _schemaInputs)
     {
-        json const dependencies = loadJsonFile("", _dependencyPaths);
-
         json mergedCompSch;
         mergedCompSch["$schema"] = "http://json-schema.org/draft-07/schema#";
 
@@ -181,12 +178,9 @@ namespace Ent
     }
 
     void updateSchemas(
-        std::filesystem::path const& _toolsDir,
-        std::filesystem::path const& _dependencyPaths,
-        std::vector<SchemaInput> const& _schemaInputs,
-        std::filesystem::path const& _outputPath)
+        std::vector<SchemaInput> const& _schemaInputs, std::filesystem::path const& _outputPath)
     {
-        json sceneSch = mergeSchemas(_dependencyPaths, _schemaInputs);
+        json sceneSch = mergeSchemas(_schemaInputs);
         {
             auto const mergedSchemaPath = _outputPath / "MergedComponents.json";
             std::stringstream buffer;
@@ -225,7 +219,7 @@ namespace Ent
             }
         }
         // Write the "TextEditorsSchema.json" file. Containing all schema for all types.
-        EntityLib entlib(_toolsDir.parent_path() / "RawData", _toolsDir / "WildPipeline/Schema");
+        EntityLib entlib(std::filesystem::current_path(), _outputPath);
         json fullWildSchema = createValidationSchema(entlib.schema.schema);
         auto const fullWildSchemaLocation = _outputPath / "TextEditorsSchema.json";
         std::stringstream buffer;

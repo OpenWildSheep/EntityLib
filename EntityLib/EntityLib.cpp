@@ -133,7 +133,7 @@ namespace Ent
         }
         return nullptr;
     }
-    
+
     static PropImplPtr getSceneParentEntity(PropImpl* _scene)
     {
         PropImplPtr entity;

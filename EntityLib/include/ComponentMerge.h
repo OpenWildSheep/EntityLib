@@ -24,14 +24,11 @@ namespace Ent
 
     /// Merge some schema files to make one final schema
     nlohmann::json mergeSchemas(
-        std::filesystem::path const& _dependencyPaths, ///< Path to the file describing dependencies between Components
         std::vector<SchemaInput> const& _schemaInputs ///< List of schema files to merge together
     );
 
     /// Merge some schema files to make one final schema file used by EntityLib
     void updateSchemas(
-        std::filesystem::path const& _toolsDir, ///< Path to P4:/Tools
-        std::filesystem::path const& _dependencyPaths, ///< Path to the file describing dependencies between Components
         std::vector<SchemaInput> const& _schemaInputs, ///< List of schema files to merge together
         std::filesystem::path const& _outputPath ///< Path to the output EntityLib schema and the TexEditor schema
     );

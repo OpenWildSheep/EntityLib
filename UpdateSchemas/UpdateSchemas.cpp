@@ -18,11 +18,15 @@ try
         "Merge RuntimeComponents.json with EditionComponents.json and Scene-schema.json");
     // clang-format off
     options.add_options()
-        ("t,toolsdir", "Path to the 'Tools' directory", cxxopts::value<path>()->default_value("X:/Tools"))
+        ("o,outputdir", "Path to the directory to export merges schemas", cxxopts::value<path>())
+        ("e,edition-schema", "Absolute path to schema files to merge as 'edition' schema", cxxopts::value<std::vector<path>>())
+        ("r,runtime-schema", "Absolute path to schema files to merge as 'runtime' schema", cxxopts::value<std::vector<path>>())
         ("h,help", "Print usage");
     // clang-format on
 
-    path toolsPath;
+    path schemaDir;
+    std::vector<path> editionSchemaToMerge;
+    std::vector<path> runtimeSchemaToMerge;
 
     try
     {
@@ -33,7 +37,9 @@ try
             return EXIT_SUCCESS;
         }
 
-        toolsPath = result["toolsdir"].as<path>();
+        schemaDir = result["outputdir"].as<path>();
+        editionSchemaToMerge = result["edition-schema"].as<std::vector<path>>();
+        runtimeSchemaToMerge = result["runtime-schema"].as<std::vector<path>>();
     }
     catch (std::exception& ex)
     {
@@ -42,44 +48,41 @@ try
         return EXIT_FAILURE;
     }
 
-    auto const* mergedCompSchemaPath = "WildPipeline/Schema/MergedComponents.json";
-    auto const* textEditorSchemaPath = "WildPipeline/Schema/TextEditorsSchema.json";
-    auto const* allSingleSchemaPath = "WildPipeline/Schema/all";
+    path mergedCompSchemaPath = schemaDir / "MergedComponents.json";
+    path textEditorSchemaPath = schemaDir / "TextEditorsSchema.json";
+    path allSingleSchemaPath = schemaDir / "all";
     char editCmd[1024];
     // Edit MergedComponents.json
-    sprintf_s(
-        editCmd, sizeof(editCmd), R"(p4 edit "%ls/%s")", toolsPath.c_str(), mergedCompSchemaPath);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%ls")", mergedCompSchemaPath.c_str());
     system(editCmd);
 
     // Edit TextEditorsSchema.json
-    sprintf_s(
-        editCmd, sizeof(editCmd), R"(p4 edit "%ls/%s")", toolsPath.c_str(), textEditorSchemaPath);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 edit "%ls")", textEditorSchemaPath.c_str());
     system(editCmd);
 
     // Get the list of deleted files
     std::set<path> deletedFiles;
-    for (directory_entry const& dir_entry : directory_iterator{toolsPath / allSingleSchemaPath})
+    for (directory_entry const& dir_entry : directory_iterator{allSingleSchemaPath})
     {
         deletedFiles.insert(dir_entry.path());
     }
 
     // Delete single schema files
-    sprintf_s(
-        editCmd, sizeof(editCmd), R"(p4 delete "%ls/%s/...")", toolsPath.c_str(), allSingleSchemaPath);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 delete "%ls/...")", allSingleSchemaPath.c_str());
     system(editCmd);
 
     // Generate schema files (MergedComponents.json, TextEditorsSchema.json and all single schema files)
-    std::vector<Ent::SchemaInput> schemaFiles = {
-        {toolsPath / "WildPipeline/Schema/RuntimeComponents.json", Ent::SchemaSource::Runtime},
-        {toolsPath / "WildPipeline/Schema/EditionComponents.json", Ent::SchemaSource::Edition},
-        {toolsPath / "WildPipeline/Schema/Scene-schema.json", Ent::SchemaSource::Edition},
-    };
+    std::vector<Ent::SchemaInput> schemaFiles;
+    for (path const& schema : editionSchemaToMerge)
+    {
+        schemaFiles.push_back(Ent::SchemaInput{schema, Ent::SchemaSource::Edition});
+    }
+    for (path const& schema : runtimeSchemaToMerge)
+    {
+        schemaFiles.push_back(Ent::SchemaInput{schema, Ent::SchemaSource::Runtime});
+    }
 
-    Ent::updateSchemas(
-        toolsPath,
-        toolsPath / "WildPipeline/Schema/Dependencies.json",
-        schemaFiles,
-        toolsPath / "WildPipeline/Schema");
+    Ent::updateSchemas(schemaFiles, schemaDir);
 
     // Make the list of files to restore and files to add
     auto fileToRestorePath = temp_directory_path() / "tempRestoreFileList.txt";
@@ -97,7 +100,7 @@ try
             fprintf(stderr, R"(Can't open file "%ls" for write)", fileToAddPath.c_str());
             return EXIT_FAILURE;
         }
-        for (directory_entry const& dir_entry : directory_iterator{toolsPath / allSingleSchemaPath})
+        for (directory_entry const& dir_entry : directory_iterator{allSingleSchemaPath})
         {
             if (deletedFiles.count(dir_entry.path()) != 0)
             {
@@ -121,16 +124,13 @@ try
     std::filesystem::remove(fileToAddPath);
 
     // Revert unchanged
-    sprintf_s(
-        editCmd, sizeof(editCmd), R"(p4 revert -a "%ls/%s")", toolsPath.c_str(), mergedCompSchemaPath);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 revert -a "%ls")", mergedCompSchemaPath.c_str());
     system(editCmd);
 
-    sprintf_s(
-        editCmd, sizeof(editCmd), R"(p4 revert -a "%ls/%s")", toolsPath.c_str(), textEditorSchemaPath);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 revert -a "%ls")", textEditorSchemaPath.c_str());
     system(editCmd);
 
-    sprintf_s(
-        editCmd, sizeof(editCmd), R"(p4 revert -a "%ls/%s/...")", toolsPath.c_str(), allSingleSchemaPath);
+    sprintf_s(editCmd, sizeof(editCmd), R"(p4 revert -a "%ls/...")", allSingleSchemaPath.c_str());
     system(editCmd);
 
     printf("Schemas update done");

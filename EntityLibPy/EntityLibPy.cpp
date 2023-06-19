@@ -607,10 +607,22 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def("search_child", &searchChild)
         .def_static("from_ptr", [](intptr_t _ptr) {return (Property*)_ptr;}, py::return_value_policy::reference_internal)
         ;
+    // clang-format on
 
     py::register_exception<JsonValidation>(ent, "JsonValidation");
+    py::register_exception_translator(
+        [](std::exception_ptr _ptr)
+        {
+            try
+            {
+                if (_ptr)
+                    std::rethrow_exception(_ptr);
+            }
+            catch (const std::filesystem::filesystem_error& e)
+            {
+                PyErr_SetString(PyExc_IOError, Ent::convertANSIToUTF8(e.what()).c_str());
+            }
+        });
 }
-
-// clang-format on
 
 /// @endcond

@@ -174,6 +174,8 @@ namespace Ent
 
         void setRebuildPropertyEnabled(bool _rebuildPropertyEnabled);
 
+        std::filesystem::path getSchemaPath() const;
+
     private:
         /// Load an Entity or a Scene, using the given cache
         template <typename Type, typename Cache, typename ValidateFunc, typename LoadFunc>
@@ -190,6 +192,7 @@ namespace Ent
         String m_fallbackEntity;
         NewDepFileCallback m_newDepFileCallback;
         size_t m_globalDocumentsVersion = 0;
+        std::filesystem::path m_schemaPath;
         bool m_rebuildPropertyEnabled = true;
     };
 

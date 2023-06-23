@@ -456,6 +456,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readonly("root_path", &EntityLib::rootPath)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
+        .def_property_readonly("schema_path", &EntityLib::getSchemaPath)
         .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Property const&, Property const&) const>(&EntityLib::makeEntityRef))
         .def("resolve_entityref",
             static_cast<std::optional<Property>(EntityLib::*)(Property const&, EntityRef const&) const>(&EntityLib::resolveEntityRef),

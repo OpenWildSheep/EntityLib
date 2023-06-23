@@ -65,12 +65,12 @@ namespace Ent
         std::filesystem::path const& _rawdataPath, std::filesystem::path const& _schemaPath)
     {
         rawdataPath = getAbsolutePath(_rawdataPath);
+        m_schemaPath = getAbsolutePath(_schemaPath);
         auto toolsDir = getAbsolutePath(rootPath / "Tools");
-        auto schemaPath = getAbsolutePath(_schemaPath);
 
-        SchemaLoader loader(schemaPath);
+        SchemaLoader loader(m_schemaPath);
 
-        json schemaDocument = loadJsonFile("", schemaPath / "MergedComponents.json");
+        json schemaDocument = loadJsonFile("", m_schemaPath / "MergedComponents.json");
 
         loader.readSchema(&schema.schema, "MergedComponents.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
@@ -98,7 +98,7 @@ namespace Ent
         }
 
         static std::string const wildComponentNameSuffix = "GD";
-        json dependencies = loadJsonFile("", schemaPath / "Dependencies.json");
+        json dependencies = loadJsonFile("", m_schemaPath / "Dependencies.json");
         for (json const& comp : dependencies["Dependencies"])
         {
             auto name = comp["className"].get<std::string>() + wildComponentNameSuffix;
@@ -718,5 +718,11 @@ namespace Ent
     {
         m_rebuildPropertyEnabled = _rebuildPropertyEnabled;
     }
+
+    std::filesystem::path EntityLib::getSchemaPath() const
+    {
+        return m_schemaPath;
+    }
+
     /// \endcond
 } // namespace Ent

@@ -457,10 +457,8 @@ PYBIND11_MODULE(EntityLibPy, ent)
         .def_readwrite("rawdata_path", &EntityLib::rawdataPath) // unit-test need to write it
         .def_readonly("schema", &EntityLib::schema, py::return_value_policy::reference_internal)
         .def_property_readonly("schema_path", &EntityLib::getSchemaPath)
-        .def("make_entityref", static_cast<EntityRef(EntityLib::*)(Property const&, Property const&) const>(&EntityLib::makeEntityRef))
-        .def("resolve_entityref",
-            static_cast<std::optional<Property>(EntityLib::*)(Property const&, EntityRef const&) const>(&EntityLib::resolveEntityRef),
-            py::keep_alive<0, 1>())
+        .def("make_entityref", &EntityLib::makeEntityRef)
+        .def("resolve_entityref", &EntityLib::resolveEntityRef, py::keep_alive<0, 1>())
         .def_readonly(
             "component_dependencies",
             &EntityLib::componentDependencies,
@@ -483,7 +481,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             "logic_error_policy",
             [](EntityLib* lib){return lib->getLogicErrorPolicy();},
             [](EntityLib* lib, LogicErrorPolicy err){lib->setLogicErrorPolicy(err);})
-        .def("get_parent_entity", static_cast<std::optional<Property>(EntityLib::*)(Property const&) const>(&EntityLib::getParentEntity), py::return_value_policy::reference_internal)
+        .def("get_parent_entity", &EntityLib::getParentEntity, py::return_value_policy::reference_internal)
         .def("get_schema", &EntityLib::getSchema, py::return_value_policy::reference_internal)
         .def("load_property", (Property (EntityLib::*)(char const*, char const*))&EntityLib::loadProperty, "schema_name"_a, "file_path"_a)
         .def("load_property", (Property (EntityLib::*)(char const*))&EntityLib::loadProperty, "file_path"_a)

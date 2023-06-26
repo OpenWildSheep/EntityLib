@@ -5,16 +5,22 @@ import logging
 import sys
 from math import fabs
 
-entitylib_path = "../x64/Release-3.7"
+entitylib_path = os.path.normpath(os.path.join(os.getcwd(), "../build/Debug"))
 if "PYTHONPATH" in os.environ:
-    os.environ["PYTHONPATH"] += "" + entitylib_path
+    os.environ["PYTHONPATH"] += ";" + entitylib_path
+    os.environ["PATH"] += ";" + entitylib_path
 else:
     os.environ["PYTHONPATH"] = entitylib_path
+    os.environ["PATH"] += entitylib_path
 
-sys.path.append(entitylib_path)
+entgen_path = os.path.normpath(os.path.join(os.getcwd(), "../build/EntGen/py2"))
+os.environ["PYTHONPATH"] += ";" + entgen_path
+
+print(os.environ["PYTHONPATH"])
+tutu = os.environ["PYTHONPATH"]
 
 import EntityLibPy as Ent
-from entgen.inline import *
+from entgen2.inline import *
 
 
 def displaySubSchema(name: str, subschema: Ent.Subschema, indent: str):
@@ -60,7 +66,7 @@ try:
     print(Ent.__doc__)
     help(Ent)
 
-    entlib = Ent.EntityLib("X:/")
+    entlib = Ent.EntityLib("X:/rawdata", "X:/Tools/WildPipeline/Schema")
 
     entlib.rawdata_path = os.getcwd()
 
@@ -816,7 +822,9 @@ try:
     print(cinematic_comp.dumps(Ent.OverrideValueSource.Any))
     
     print("Done")
-
+except RuntimeError as ex:
+    print(traceback.format_exc())
+    print(str(ex))
 except subprocess.CalledProcessError as err:
     print(traceback.format_exc())
     print(err.output)

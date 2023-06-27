@@ -50,6 +50,7 @@ target_link_libraries(TestEntGen EntityLib)
 file(GLOB TESTENTITYLIB_SOURCES "Test/*.cpp")
 add_executable(TestEntityDLL ${TESTENTITYLIB_SOURCES})
 target_include_directories(TestEntityDLL PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/EntGen/cpp2)
+target_include_directories(TestEntityDLL PRIVATE submodules/cxxopts/include)
 target_link_libraries(TestEntityDLL EntityLib)
 
 file(GLOB UPDATESCHEMA_SOURCES "UpdateSchemas/*.cpp")

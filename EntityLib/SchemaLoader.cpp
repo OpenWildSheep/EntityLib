@@ -100,7 +100,17 @@ namespace Ent
                 for (auto const& token :
                      splitString(objectPath.string(), std::filesystem::path::preferred_separator))
                 {
-                    node = &((*node).at(token));
+                    if (auto iter = node->find(token); iter != node->end())
+                    {
+                        node = &(*iter);
+                    }
+                    else
+                    {
+                        fprintf(
+                            stderr,
+                            "ERROR : Definition for \"%s\" is referenced but not defined\n",
+                            token.c_str());
+                    }
                 }
                 parseSchemaNoRef(fileName, *refRoot, *node, vis, depth);
             }

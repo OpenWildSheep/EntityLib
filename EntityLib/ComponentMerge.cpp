@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <ciso646>
+#include <iostream>
 
 #include "Tools.h"
 
@@ -180,22 +181,25 @@ namespace Ent
     void updateSchemas(
         std::vector<SchemaInput> const& _schemaInputs, std::filesystem::path const& _outputPath)
     {
+        auto absOutputPath = absolute(_outputPath);
         json sceneSch = mergeSchemas(_schemaInputs);
         {
-            auto const mergedSchemaPath = _outputPath / "MergedComponents.json";
+            create_directories(absOutputPath);
+            auto const mergedSchemaPath = absOutputPath / "MergedComponents.json";
             std::stringstream buffer;
             buffer << sceneSch.dump(4);
+            std::cout << "Write file : " << mergedSchemaPath << std::endl;
             std::ofstream file(mergedSchemaPath);
             if (not file.is_open())
             {
                 throw FileSystemError(
-                    "Trying to open file for write", _outputPath, "MergedComponents.json");
+                    "Trying to open file for write", absOutputPath, "MergedComponents.json");
             }
             file << buffer.str();
         }
         // Export all type schemas in the "all" subdirectory
         // Actually each file only reference the "TextEditorsSchema.json" file.
-        auto allSingleSchemaPath = std::filesystem::path(_outputPath / "all");
+        auto allSingleSchemaPath = std::filesystem::path(absOutputPath / "all");
         create_directories(allSingleSchemaPath);
         for (auto&& [name, defs] : sceneSch["definitions"].items())
         {
@@ -219,17 +223,18 @@ namespace Ent
             }
         }
         // Write the "TextEditorsSchema.json" file. Containing all schema for all types.
-        EntityLib entlib(std::filesystem::current_path(), _outputPath);
+        EntityLib entlib(std::filesystem::current_path(), absOutputPath);
         json fullWildSchema = createValidationSchema(entlib.schema.schema);
-        auto const fullWildSchemaLocation = _outputPath / "TextEditorsSchema.json";
+        auto const fullWildSchemaLocation = absOutputPath / "TextEditorsSchema.json";
         std::stringstream buffer;
         buffer << fullWildSchema.dump(4);
 
+        std::cout << "Write file : " << fullWildSchemaLocation << std::endl;
         std::ofstream file(fullWildSchemaLocation);
         if (not file.is_open())
         {
             throw FileSystemError(
-                "Trying to open file for write", _outputPath, "TextEditorsSchema.json");
+                "Trying to open file for write", absOutputPath, "TextEditorsSchema.json");
         }
         file << buffer.str();
     }

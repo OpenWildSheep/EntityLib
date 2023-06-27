@@ -64,8 +64,20 @@ namespace Ent
     EntityLib::EntityLib(
         std::filesystem::path const& _rawdataPath, std::filesystem::path const& _schemaPath)
     {
-        rawdataPath = getAbsolutePath(_rawdataPath);
-        m_schemaPath = getAbsolutePath(_schemaPath);
+        auto getAbsPath = [this](auto const& _path)
+        {
+            if (_path.is_absolute())
+            {
+                return very_weakly_canonical(_path);
+            }
+            else
+            {
+                return very_weakly_canonical(std::filesystem::current_path() / _path);
+            }
+        };
+
+        rawdataPath = getAbsPath(_rawdataPath);
+        m_schemaPath = getAbsPath(_schemaPath);
         auto toolsDir = getAbsolutePath(rootPath / "Tools");
 
         SchemaLoader loader(m_schemaPath);
@@ -75,50 +87,33 @@ namespace Ent
         loader.readSchema(&schema.schema, "MergedComponents.json", schemaDocument, schemaDocument);
         schema.schema.entityLib = this;
 
-        auto&& compList = schema.schema.allDefinitions.at("Component").oneOf;
-
-        for (SubschemaRef& comp : *compList)
+        static constexpr char WildComponentNameSuffix[] = "GD";
+        auto const dependenciesPath = m_schemaPath / "Dependencies.json";
+        if (exists(dependenciesPath))
         {
-            auto&& compName = AT(comp->properties, "Type")->constValue->get<std::string>();
-            auto&& compSchema = *AT(comp->properties, "Data");
-            compSchema.meta = comp->meta;
-            schema.components.emplace(compName, &compSchema);
-        }
-
-        auto&& actorstateList =
-            schema.schema.allDefinitions.at("ResponsiblePointer<ActorState>").oneOf;
-
-        for (SubschemaRef& actorstate : *actorstateList)
-        {
-            auto&& actorstateName =
-                AT(actorstate->properties, "className")->constValue->get<std::string>();
-            auto&& actorstateSchema = *AT(actorstate->properties, "classData");
-            actorstateSchema.meta = actorstate->meta;
-            schema.actorstates.emplace(actorstateName, &actorstateSchema);
-        }
-
-        static std::string const wildComponentNameSuffix = "GD";
-        json dependencies = loadJsonFile("", m_schemaPath / "Dependencies.json");
-        for (json const& comp : dependencies["Dependencies"])
-        {
-            auto name = comp["className"].get<std::string>() + wildComponentNameSuffix;
-            std::vector<std::string> deps;
-            for (json const& dep : comp["dependencies"])
+            json dependencies = loadJsonFile("", dependenciesPath);
+            for (json const& comp : dependencies["Dependencies"])
             {
-                if (not dep["Optional"].get<bool>())
+                auto name = comp["className"].get<std::string>() + WildComponentNameSuffix;
+                std::vector<std::string> deps;
+                for (json const& dep : comp["dependencies"])
                 {
-                    deps.push_back(dep["Name"].get<std::string>() + wildComponentNameSuffix);
+                    if (not dep["Optional"].get<bool>())
+                    {
+                        deps.push_back(dep["Name"].get<std::string>() + WildComponentNameSuffix);
+                    }
                 }
-            }
-            componentDependencies.emplace(name, std::move(deps));
+                componentDependencies.emplace(name, std::move(deps));
 
-            std::vector<std::string> incompatibleComponents;
-            for (json const& incompatibility : comp["incompatibilities"])
-            {
-                incompatibleComponents.push_back(
-                    incompatibility["Name"].get<std::string>() + wildComponentNameSuffix);
+                std::vector<std::string> incompatibleComponents;
+                for (json const& incompatibility : comp["incompatibilities"])
+                {
+                    incompatibleComponents.push_back(
+                        incompatibility["Name"].get<std::string>() + WildComponentNameSuffix);
+                }
+                componentIncompatibilities.emplace(
+                    std::move(name), std::move(incompatibleComponents));
             }
-            componentIncompatibilities.emplace(std::move(name), std::move(incompatibleComponents));
         }
     }
 

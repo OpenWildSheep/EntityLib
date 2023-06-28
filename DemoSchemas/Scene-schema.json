@@ -1,0 +1,28 @@
+{
+    "$ref": "#/definitions/Scene",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "Entity": {
+            "properties": {
+                "Color": {
+                    "$ref": "./RuntimeComponents.json#/definitions/Color"
+                },
+                "Components": {
+                    "items": {
+                        "$ref": "./MergedComponents.json#/definitions/Component"
+                    },
+                    "type": "array",
+					"meta" : {
+						"overridePolicy":"set",
+						"ordered" : false
+					}
+                },
+                "Name": {
+                    "type": "string"
+                }
+            },
+            "title": "Entity",
+            "type": "object"
+        }
+    }
+}

@@ -1,0 +1,397 @@
+{
+    "definitions" : {
+      "Position" : {
+         "items" : [
+            {
+               "meta" : {
+                  "bitdepth" : 16,
+                  "signed" : false
+               },
+               "type" : "integer"
+            },
+            {
+               "meta" : {
+                  "bitdepth" : 16,
+                  "signed" : false
+               },
+               "type" : "integer"
+            },
+            {
+               "meta" : {
+                  "bitdepth" : 32,
+                  "signed" : true
+               },
+               "type" : "number"
+            },
+            {
+               "meta" : {
+                  "bitdepth" : 32,
+                  "signed" : true
+               },
+               "type" : "number"
+            },
+            {
+               "meta" : {
+                  "bitdepth" : 32,
+                  "signed" : true
+               },
+               "type" : "number"
+            }
+         ],
+         "maxItems" : 5,
+         "minItems" : 5,
+         "type" : "array"
+      },		
+      "TagsList" : {
+         "properties" : {
+            "Tags" : {
+               "items" : {
+                  "items" : [
+                     {
+                        "type" : "string"
+                     },
+                     {
+                        "items" : {
+                           "type" : "string"
+                        },
+                        "meta" : {
+                           "ordered" : true,
+                           "overridePolicy" : "set"
+                        },
+                        "type" : "array"
+                     }
+                  ],
+                  "maxItems" : 2,
+                  "minItems" : 2,
+                  "type" : "array"
+               },
+               "meta" : {
+                  "ordered" : true,
+                  "overridePolicy" : "map"
+               },
+               "type" : "array"
+            }
+         },
+         "type" : "object"
+      },
+      "Quat" : {
+         "default" : [ 0.0, 0.0, 0.0, 1.0 ],
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 4,
+         "minItems" : 4,
+         "type" : "array"
+      },
+      "Color" : {
+         "default" : [ 1.0, 1.0, 1.0, 1.0 ],
+         "items" : {
+            "maximum" : 1.0,
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "minimum" : 0.0,
+            "type" : "number"
+         },
+         "maxItems" : 4,
+         "meta" : {
+            "user" : {
+               "widget" : "color"
+            }
+         },
+         "minItems" : 4,
+         "type" : "array"
+      },
+      "Vector2" : {
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 2,
+         "minItems" : 2,
+         "type" : "array"
+      },
+      "Vector3" : {
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 3,
+         "minItems" : 3,
+         "type" : "array"
+      },
+      "Vector3i" : {
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "integer"
+         },
+         "maxItems" : 3,
+         "minItems" : 3,
+         "type" : "array"
+      },
+      "Vector4" : {
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 4,
+         "minItems" : 4,
+         "type" : "array"
+      },
+      "Matrix22" : {
+         "default" : [ 1.0, 0.0, 0.0, 1.0 ],
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 4,
+         "minItems" : 4,
+         "type" : "array"
+      },
+      "Matrix32" : {
+         "default" : [ 1.0, 0.0, 0.0, 1.0, 0.0, 0.0 ],
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 6,
+         "minItems" : 6,
+         "type" : "array"
+      },
+      "Matrix33" : {
+         "default" : [ 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 ],
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 9,
+         "minItems" : 9,
+         "type" : "array"
+      },
+      "Matrix43" : {
+         "default" : [ 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0 ],
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 12,
+         "minItems" : 12,
+         "type" : "array"
+      },
+      "Matrix44" : {
+         "default" : [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0
+         ],
+         "items" : {
+            "meta" : {
+               "bitdepth" : 32,
+               "signed" : true
+            },
+            "type" : "number"
+         },
+         "maxItems" : 16,
+         "minItems" : 16,
+         "type" : "array"
+      },		
+		"ComponentGD" : {
+			"type" : "object"
+		},
+		"TransformGD" : {
+			"properties" : {
+				"Matrix" : {
+					"$ref" : "#/definitions/Matrix33",
+					"default" : [ 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 ]
+				},
+				"Position" : {
+				   "$ref" : "#/definitions/Vector3",
+				   "default" : [ 0.0, 0.0, 0.0 ]
+				},
+				"Super" : {
+				   "$ref" : "#/definitions/ComponentGD"
+				}
+			},
+			"type" : "object"
+		},
+      "eastl::variant<s32,float,bool,eastl::string,Vector2,Vector3,Quat,Position>" : {
+         "meta" : {
+            "unionDataField" : "variantData",
+            "unionIndexField" : "variantIndex",
+            "unionTypeField" : "variantType"
+         },
+         "oneOf" : [
+            {
+               "properties" : {
+                  "variantData" : {
+                     "description" : "Value of this variant, according to \"variantType\" value.",
+                     "meta" : {
+                        "bitdepth" : 32,
+                        "signed" : true
+                     },
+                     "type" : "integer"
+                  },
+                  "variantType" : {
+                     "const" : "s32",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            },
+            {
+               "properties" : {
+                  "variantData" : {
+                     "description" : "Value of this variant, according to \"variantType\" value.",
+                     "meta" : {
+                        "bitdepth" : 32,
+                        "signed" : true
+                     },
+                     "type" : "number"
+                  },
+                  "variantType" : {
+                     "const" : "float",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            },
+            {
+               "properties" : {
+                  "variantData" : {
+                     "description" : "Value of this variant, according to \"variantType\" value.",
+                     "type" : "boolean"
+                  },
+                  "variantType" : {
+                     "const" : "bool",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            },
+            {
+               "properties" : {
+                  "variantData" : {
+                     "description" : "Value of this variant, according to \"variantType\" value.",
+                     "type" : "string"
+                  },
+                  "variantType" : {
+                     "const" : "string",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            },
+            {
+               "properties" : {
+                  "variantData" : {
+                     "$ref" : "#/definitions/Vector2",
+                     "description" : "Value of this variant, according to \"variantType\" value."
+                  },
+                  "variantType" : {
+                     "const" : "Vector2",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            },
+            {
+               "properties" : {
+                  "variantData" : {
+                     "$ref" : "#/definitions/Vector3",
+                     "description" : "Value of this variant, according to \"variantType\" value."
+                  },
+                  "variantType" : {
+                     "const" : "Vector3",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            },
+            {
+               "properties" : {
+                  "variantData" : {
+                     "$ref" : "#/definitions/Quat",
+                     "description" : "Value of this variant, according to \"variantType\" value."
+                  },
+                  "variantType" : {
+                     "const" : "Quat",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            },
+            {
+               "properties" : {
+                  "variantData" : {
+                     "$ref" : "#/definitions/Position",
+                     "description" : "Value of this variant, according to \"variantType\" value."
+                  },
+                  "variantType" : {
+                     "const" : "Position",
+                     "description" : "Type name of this variant.",
+                     "type" : "string"
+                  }
+               },
+               "required" : [ "variantType", "variantData" ],
+               "type" : "object"
+            }
+         ]
+      }		
+   }
+}

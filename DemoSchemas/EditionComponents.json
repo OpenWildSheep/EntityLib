@@ -1,0 +1,298 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "TransformGD" : {
+            "properties" : {
+                "Orientation" : {
+                   "$ref" : "./RuntimeComponents.json#/definitions/Quat"
+                },
+                "Scale" : {
+                   "$ref" : "./RuntimeComponents.json#/definitions/Vector3",
+                   "default" : [ 1.0, 1.0, 1.0 ]
+                }
+            },
+            "type" : "object"
+        },
+        "SubScene": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Entities": {
+					"meta": {
+						"overridePolicy": "set",
+						"keyField": "Name"
+					},
+                    "type": "array",
+                    "items": {
+                        "$ref": "./Scene-schema.json#/definitions/Entity"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "TestDefaultValues" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Matrix": {
+                    "$ref": "./RuntimeComponents.json#/definitions/Matrix33"
+                },
+                "Matrix2": {
+                    "$ref": "./RuntimeComponents.json#/definitions/Matrix33"
+                },
+                "propertyWithDefault": {
+                    "$ref": "#/definitions/TestPropertyDefaultValues2",
+                    "default": {
+                        "propertyWithDefault2": {
+                            "A": 3
+                        },
+                        "propertyWithDefault3": {
+                            "A": 3
+                        }
+                    }
+                },
+                "DoubleWithDefaultValue": {
+                    "default": 1.23456,
+                    "meta": {
+                        "bitdepth": 32,
+                        "signed": true
+                    },
+                    "type": "number"
+                }
+            },
+            "default":{
+                "Matrix2":[0, 0, 0, 0, 4, 0, 0, 0, 0]
+            },
+            "type": "object"
+        },
+        "TestPropertyDefaultValues2" : {
+            "properties" : {
+                "propertyWithDefault2": {
+                    "$ref": "#/definitions/TestPropertyDefaultValues",
+                    "default": {
+                        "A": 1,
+                        "B": 2
+                    }
+                },
+                "propertyWithDefault3": {
+                    "$ref": "#/definitions/TestPropertyDefaultValues"
+                }
+            },
+            "default": {
+                "propertyWithDefault3": {
+                    "default": {
+                        "A": 1,
+                        "B": 2
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "TestPropertyDefaultValues" : {
+            "properties" : {
+                "A": {
+                    "type": "integer"
+                },
+                "B": {
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "TestArrays" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Variant" : {
+                   "$ref" : "./RuntimeComponents.json#/definitions/eastl::variant<s32,float,bool,eastl::string,Vector2,Vector3,Quat,Position>"
+                },
+                "OverridedPrefabValue": {
+                    "type" : "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 1,
+                    "default": [0, 0]
+                },
+                "PrefabValue": {
+                    "type" : "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 1,
+                    "default": [0, 0]
+                },
+                "OverridedDefaultValue": {
+                    "type" : "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 1,
+                    "default": [0, 0]
+                },
+                "DefaultValue": {
+                    "type" : "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 1,
+                    "default": [0, 0]
+                }
+            },
+            "type": "object"
+        },
+        "TestSetOfObject": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "SetOfObject": {
+                    "meta" : {
+                       "ordered" : true,
+                       "overridePolicy" : "set",
+                       "keyField" : "Name"
+                    },
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "Name": {
+                                "type": "string"
+                            },
+                            "Value": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "MapOfObject": {
+                    "meta" : {
+                       "ordered" : true,
+                       "overridePolicy" : "map"
+                    },
+                    "type": "array",
+                    "items":{
+                        "type": "array",
+                        "items": [
+                            {
+                                "type": "string"
+                            }, {
+                                "type": "object",
+                                "properties": {
+                                    "Value": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "MapOfPrimitive": {
+                    "meta" : {
+                       "ordered" : true,
+                       "overridePolicy" : "map"
+                    },
+                    "type": "array",
+                    "items":{
+                        "type": "array",
+                        "items": [
+                            {
+                                "type": "string"
+                            }, 
+							{
+                                "type": "integer"
+                            }
+                        ]
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "TestTagsList" : {
+            "properties" : {
+				"Radius" : {
+					"default" : 1.0,
+					"meta" : {
+						"bitdepth" : 32,
+						"signed" : true
+					},
+					"type" : "number"
+				},
+				"Super" : {
+					"$ref" : "#/definitions/ComponentGD"
+				},
+				"Tags" : {
+					"$ref" : "#/definitions/TagsList",
+					"default" : {
+						"Tags" : []
+					}
+				}
+			},
+			"type" : "object"
+		},		
+        "TestUnion": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Union": {
+                    "$ref": "./RuntimeComponents.json#/definitions/eastl::variant<s32,float,bool,eastl::string,Vector2,Vector3,Quat,Position>"
+                },
+                "UnionArray": {
+					"type": "array",
+                    "items":{
+						"$ref": "./RuntimeComponents.json#/definitions/eastl::variant<s32,float,bool,eastl::string,Vector2,Vector3,Quat,Position>"
+					}
+                },
+                "UnionObjectArray": {
+					"type": "array",
+                    "items":{
+						"type": "object",
+						"properties": {
+							"Union": {
+								"$ref": "./RuntimeComponents.json#/definitions/eastl::variant<s32,float,bool,eastl::string,Vector2,Vector3,Quat,Position>"
+							}
+						}
+					}
+                }
+            },
+            "type": "object"
+        },
+        "UnitTestComponent": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+				"EnumSet" : {
+					"items" : {
+						"enum" : [ "neutral", "sacred", "cursed", "ReviveSide_COUNT" ],
+						"name" : "ReviveSide",
+						"type" : "string"
+					},
+					"meta" : {
+						"ordered" : true,
+						"overridePolicy" : "set"
+					},
+					"type" : "array"
+				},
+				"SimpleArray" : {
+					"items" : {
+						"name" : "ReviveSide",
+						"type" : "string"
+					},
+					"type" : "array"
+				},
+				"Position" : {
+				   "$ref" : "./RuntimeComponents.json#/definitions/Position"
+				},
+				"Entity": {  
+					"$ref": "./Scene-schema.json#/definitions/Entity"
+				}
+            },
+            "type": "object"
+        }
+    }
+}

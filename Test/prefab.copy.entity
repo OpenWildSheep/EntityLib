@@ -85,6 +85,10 @@
         },
         {
             "Data": {},
+            "Type": "SmoothScaleComponentGD"
+        },
+        {
+            "Data": {},
             "Type": "PhysicsGD"
         },
         {

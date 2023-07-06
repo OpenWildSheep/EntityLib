@@ -61,9 +61,13 @@ namespace Ent
         return c.make_preferred();
     }
 
-    EntityLib::EntityLib(
-        std::filesystem::path const& _rawdataPath, std::filesystem::path const& _schemaPath)
+    EntityLib::EntityLib(std::filesystem::path _rawdataPath, std::filesystem::path const& _schemaPath)
     {
+        if ((_rawdataPath.native().back() != L'/') || (_rawdataPath.native().back() != L'\\'))
+        {
+            _rawdataPath = (_rawdataPath.native() + L'/');
+        }
+
         auto getAbsPath = [this](auto const& _path)
         {
             if (_path.is_absolute())

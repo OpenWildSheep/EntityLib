@@ -375,7 +375,7 @@ namespace Ent
         {
             return getPimpl().isSet();
         }
-        void unset() const ///< Remove values in instance
+        void unset() const ///< Remove overriden values in instance. Can't remove an item in a map.
         {
             return getPimpl().unset();
         }

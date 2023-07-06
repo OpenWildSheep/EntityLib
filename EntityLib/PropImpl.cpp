@@ -121,6 +121,10 @@ namespace Ent
         : m_default(*_entityLib)
         , m_instance(*_entityLib)
     {
+        if (_schema == nullptr)
+        {
+            throw Ent::NullPointerArgument("_schema", __func__);
+        }
         if (_doc == nullptr)
         {
             auto& versionedDoc = _entityLib->readJsonFile(_filename);

@@ -1,24 +1,142 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "SoundOpportunityComponentGD": {
+            "properties": {
+                "EDITOR_FilterTag": {
+                    "type": "string"
+                },
+                "RangeDescriptions": {
+                    "items": {
+                        "$ref": "#/definitions/SoundOpportunityRangeDescription"
+                    },
+                    "type": "array"
+                },
+                "Super": {
+                    "$ref": "#/definitions/ComponentGD"
+                }
+            },
+            "type" : "object"
+        },
+        "SoundOpportunityRangeDescription": {
+            "properties": {
+                "EDITOR_SelectionProbabilityFactor": {
+                    "default": 1.0,
+                    "meta": {
+                        "bitdepth": 32,
+                        "signed": true
+                    },
+                    "type": "number"
+                },
+                "ChunkSize": {
+                    "default": 32.0,
+                    "meta": {
+                        "bitdepth": 32,
+                        "signed": true
+                    },
+                    "type": "number"
+                },
+                "MaxDistance": {
+                    "default": 0.0,
+                    "meta": {
+                        "bitdepth": 32,
+                        "signed": true
+                    },
+                    "type": "number"
+                },
+                "PCloudPath": {
+                    "default": "",
+                    "meta": {
+                        "user": {
+                            "path": {
+                                "folder": false,
+                                "glob": "*.pcloud"
+                            }
+                        }
+                    },
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "TransformGD" : {
             "properties" : {
+                "EDITOR_PropagateScaleToSubScene": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "EDITOR_InheritScaleFromSubSceneHolder": {
+                    "type": "boolean",
+                    "default": true
+                },
                 "Orientation" : {
                    "$ref" : "./RuntimeComponents.json#/definitions/Quat"
                 },
                 "Scale" : {
                    "$ref" : "./RuntimeComponents.json#/definitions/Vector3",
                    "default" : [ 1.0, 1.0, 1.0 ]
+                },
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
                 }
             },
             "type" : "object"
+        },
+        "ReflectedMaterialGroup": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Color":
+                {
+                    "$ref" : "#/definitions/Color"
+                }
+            }
+        },
+        "StaticObjectGD": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "EDITOR_UsedInMultiLayerHeightmap": {
+                    "type": "boolean",
+                    "default": true,
+					"description": "Determines, if this object is static, if it should be merged with the terrain when generating the multi-layer height map (only works if this static object has mesh colliders)"
+                },
+                "EDITOR_MergeInNavMesh": {
+                    "type": "boolean",
+                    "default": true,
+					"description": "Determines, if this object is static, if it should be merged with the terrain when generating the nav mesh (only works if this static object's nav mesh stamper is active and has actual stampers set)"
+                },
+                "EDITOR_IsCave": {
+                    "type": "boolean",
+                    "default": false,
+					"description": "By default, static objects merged with the terrain have their faces culled, when found under the terrain - this flag prevents that for static meshes that we know represent underground elements like caves"
+                },
+                "EDITOR_IsUnclosedMesh": {
+                    "type": "boolean",
+                    "default": false,
+					"description": "This tells the tools that this mesh is intended to stay opened (otherwise tools by default force meshes to be closed for optimizations)"
+                }
+            }
+        },
+        "Mesh": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "File": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
         },
         "SubScene": {
             "properties": {
                 "Super": {
                     "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
                 },
-                "Entities": {
+                "Embedded": {
 					"meta": {
 						"overridePolicy": "set",
 						"keyField": "Name"
@@ -27,6 +145,832 @@
                     "items": {
                         "$ref": "./Scene-schema.json#/definitions/Entity"
                     }
+                },
+                "RuntimeMode": {
+                    "enum" : [ "None", "Container", "Compound" ],
+                    "default": "None",
+                    "type" : "string",
+                    "title": "Runtime Mode",
+                    "description": "This describes how this sub-scene will behave at runtime:\nNone: sub-scene does not exist at runtime.\nContainer: sub-scene is an entity with every sub-entities parented to it.\nCompound: sub-scene is an entity with every sub-entities parented to it and are flagged as non-root entities, meaning they do not have any meaning outside their compound scene. (ex: tree and branches)"
+                }
+            },
+            "type": "object"
+        },
+        "NetworkNode": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Type": {
+                    "type": "string"
+                },
+                "Tag": {
+                    "type": "string"
+                },
+                "ThumbnailMesh": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wthumb"
+                          }
+                       }
+                    },
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StickToTerrain": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "ZOffset": {
+                    "type": "number",
+                    "default": 0.0
+                },
+                "NormalRatio": {
+                    "type": "number",
+                    "default": 0.5
+                },
+                "useNormal": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "precisionRadius": {
+                    "type": "number",
+                    "default": 2.0
+                }
+            },
+            "type": "object"
+        },
+        "NetworkLink": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Source": {
+                    "type": "string"
+                },
+                "Target": {
+                    "type": "string"
+                },
+                "SourceEntityRef": {
+                    "$ref": "#/definitions/EntityRef"
+                },
+                "TargetEntityRef": {
+                    "$ref": "#/definitions/EntityRef"
+                },
+                "ThumbnailMesh": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wthumb"
+                          }
+                       }
+                    },
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "TerrainGD": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "EDITOR_TerrainWildMat": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wildMat"
+                          }
+                       }
+                    },
+                    "type": "string",
+                    "default": "03_Environment/Material/GroundOutsideV2/GroundOutsideV2.wildMat"
+                },
+                "EDITOR_ExportQuality": {
+                    "type": "integer",
+                    "default": 4
+                },
+                "EDITOR_ExportCollision": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "EDITOR_PreviewQuality": {
+                    "type": "integer",
+                    "default": 1
+                },
+                "EDITOR_Path": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : true
+                          }
+                       }
+                    },
+                    "type": "string"
+                },
+                "EDITOR_DetailMapFalloff": {
+                    "type": "integer",
+                    "default": 0
+                },
+                "EDITOR_DetailScale": {
+                    "type": "number",
+                    "default": 0.3
+                },
+                "EDITOR_ProcessDetailMap": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "EDITOR_CavityStrength": {
+                    "type": "number",
+                    "default": 5.0
+                },
+                "EDITOR_CavityAlbedoStrength": {
+                    "type": "number",
+                    "default": 0.2
+                },
+                "EDITOR_Distributed": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "EDITOR_LocalSndbs": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_Erosion": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "EDITOR_ErosionType": {
+                    "type": "integer",
+                    "default": 1
+                },
+                "EDITOR_AlbedoType": {
+                    "type": "integer",
+                    "default": 3
+                },
+                "EDITOR_WMErosionPreview": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_WMErosionComputeDistant":{
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_DisplayFinal": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_ComputeSurfaceObjectTerrain": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_MergeTSOPreview": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_TriPerMeter": {
+                    "type": "integer",
+                    "default": 2
+                },
+                "EDITOR_CollisionDecimateHmm": {
+                    "type": "number",
+                    "default": 0.05
+                },
+                "EDITOR_SurfaceObjectDecimate": {
+                    "type": "number",
+                    "default": 0.2
+                },
+                "EDITOR_SurfaceObjectDecimateHmm": {
+                    "type": "number",
+                    "default": 0.05
+                },
+                "EDITOR_SeedTextureSizeReduce": {
+                    "type": "integer",
+                    "default": 1
+                },
+                "EDITOR_DisableSeedParams": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_SuperimposeSeeds": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_DebugMode": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "EDITOR_MultiLayerHeightmap": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "EDITOR_DisplayAlbedo": {
+                    "type": "boolean",
+                    "default": false
+                }
+            },
+            "type": "object"
+        },
+        "HeightObj": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Subdivision": {
+                    "type": "integer",
+                    "default": 3,
+                    "meta": {
+                        "user":{
+                            "testUserMetatdata": 42
+                        }
+                    }
+                },
+                "EditorSubdivision": {
+                    "type": "integer",
+                    "default": 3
+                },
+                "MeshName": {
+                    "type": "string"
+                },
+                "MeshFile": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.who"
+                          }
+                       }
+                    },
+                    "type": "string"
+                },
+                "Priority": {
+                    "type": "integer",
+                    "default": 0
+                },
+                "LocalMatrix": {
+                    "$ref": "./RuntimeComponents.json#/definitions/Matrix33"
+                },
+                "DisplaceNoiseList": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "LuminanceCenter": {
+                                "type": "number",
+                                "default": 0.5
+                            },
+                            "MotifSizeX": {
+                                "type": "number",
+                                "default": 256.0
+                            },
+                            "MotifSizeY": {
+                                "type": "number",
+                                "default": 256.0
+                            },
+                            "MotifOffsetX": {
+                                "type": "number",
+                                "default": 0.0
+                            },
+                            "MotifOffsetY": {
+                                "type": "number",
+                                "default": 0.0
+                            },
+                            "MotifRotationZ": {
+                                "type": "number",
+                                "default": 0.0
+                            },
+                            "DisplaceDistance": {
+                                "type": "number",
+                                "default": 5.0
+                            },
+                            "MapChannel": {
+                                "type": "integer",
+                                "default": -1
+                            },
+                            "MotifName": {
+                                "type": "string",
+                                "default": ""
+                            }
+                        }
+                    }
+                },
+                "PostErosion": {
+                    "type": "boolean"
+                }				
+            },
+            "type": "object"
+        },
+        "SystemicCreature": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "UniqueID": {
+                    "type": "string"
+                },
+                "Spawner": {
+                    "type": "string"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Life": {
+                    "type": "number"
+                },
+                "PlayerSpawn": {
+                    "type": "boolean"
+                },
+                "CameraTarget": {
+                    "type": "boolean"
+                },
+                "Invincible": {
+                    "type": "boolean"
+                },
+                "Warrior": {
+                    "type": "boolean"
+                },
+                "Burried": {
+                    "type": "boolean"
+                },
+                "CanBeMaster": {
+                    "type": "boolean"
+                },
+                "Inventory": {
+                    "type": "string"
+                },
+                "Faction": {
+                    "type": "string"
+                },
+                "BehaviorPath": {
+                    "type": "string"
+                },
+                "BehaviorState": {
+                    "type": "string"
+                },
+                "BehaviorModifierTagList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "ScriptList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "SeedPatchDatas" : {
+            "type": "object",
+            "properties": {
+                "DataMap" : {
+                    "items" : {
+                        "items" : [
+                            {
+                                "type" : "string"
+                            },
+                            {
+                                "$ref" : "#/definitions/SeedPatchData"
+                            }
+                        ],
+                        "maxItems" : 2,
+                        "minItems" : 2,
+                        "type" : "array"
+                    },
+                    "meta" : {
+                        "ordered" : true,
+                        "overridePolicy" : "map"
+                    },
+                   "type" : "array"
+                }
+            }
+        },
+        "SeedPatchDataList" : {
+            "type": "object",
+            "properties": {
+                "Data" : {
+                    "type" : "array",
+                    "items" : {
+                        "$ref" : "#/definitions/SeedPatchData"
+                    }
+                }
+            }
+        },
+        "SeedPatch": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "NoiseSizeX": {
+                    "type": "number",
+                    "default": 256.0
+                },
+                "NoiseSizeY": {
+                    "type": "number",
+                    "default": 256.0
+                },
+                "NoiseOffsetX": {
+                    "type": "number",
+                    "default": 0.0
+                },
+                "NoiseOffsetY": {
+                    "type": "number",
+                    "default": 0.0
+                },
+                "Subdivision": {
+                    "type": "integer",
+                    "default": 1
+                },
+                "AddVertexColor": {
+                    "type": "boolean"
+                },
+                "SeedName": {
+                    "type": "string"
+                },
+                "NoiseName": {
+                    "type": "string"
+                },
+                "SeedOverride": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "MeshFile": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wsp"
+                          }
+                       }
+                    },
+                    "type": "string"
+                },
+                "LocalMatrix": {
+                    "$ref": "./RuntimeComponents.json#/definitions/Matrix33"
+                },
+                "SeedPatchDatas": {
+                    "$ref" : "#/definitions/SeedPatchDatas"
+                },
+                "SeedPatchDataList": {
+                    "$ref" : "#/definitions/SeedPatchDataList"
+                }
+            },
+            "type": "object"
+        },
+        "SeedPatchData": 
+        {
+            "properties" : {
+                "NoiseSizeX": {
+                    "type": "number",
+                    "default": 256.0
+                },
+                "NoiseSizeY": {
+                    "type": "number",
+                    "default": 256.0
+                },
+                "NoiseOffsetX": {
+                    "type": "number",
+                    "default": 0.0
+                },
+                "NoiseOffsetY": {
+                    "type": "number",
+                    "default": 0.0
+                },                
+                "NoisePosition": {
+                    "type": "number",
+                    "default": 0.5
+                },
+                "NoiseContrast": {
+                    "type": "number",
+                    "default": 0.0
+                },
+                "NoiseOpacity": {
+                    "type": "number",
+                    "default": 1.0
+                },
+                "NoiseInvert": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "NoiseBlur": {
+                    "type": "number",
+                    "default": 0.0
+                },                
+                "SeedName": {
+                    "type": "string"
+                },
+                "NoiseName": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "BiomePatch": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "MaterialGroupName": {
+                    "type": "string"
+                },
+                "MeshFile": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wbp"
+                          }
+                       }
+                    },
+                    "type": "string"
+                },
+                "Priority": {
+                    "type": "integer",
+                    "default": 0
+                },
+                "Subdivision": {
+                    "type": "integer",
+                    "default": 0
+                },
+                "LocalMatrix": {
+                    "$ref": "./RuntimeComponents.json#/definitions/Matrix33"
+                }
+            },
+            "type": "object"
+        },
+        "WildObject": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "ObjectType": {
+                    "type": "string"
+                },
+                "GdPath": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "LDPrimitive": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "NonDisuptive": {
+                    "type": "boolean"
+                },
+                "PrimitiveType": {
+                    "type": "string"
+                },
+                "PrimitiveData": {
+                    "type": "object",
+                    "properties": {
+                        "Width": {
+                            "type": "number"
+                        },
+                        "Length": {
+                            "type": "number"
+                        },
+                        "Height": {
+                            "type": "number"
+                        },
+                        "Radius": {
+                            "type": "number"
+                        }
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "VisualGD": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "RUNTIME_LODScale": {
+                    "type": "number",
+                    "default" : 0.025
+                },
+                "EDITOR_LODs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "lod": {
+                                "type": "integer"
+                            },
+                            "wvis": {
+                                "type": "array",
+                                "items": {
+                                    "default" : "",
+                                    "meta" : {
+                                       "user" : {
+                                          "path" : {
+                                             "folder" : false,
+                                             "glob" : "*.wvis"
+                                          }
+                                       }
+                                    },
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "RUNTIME_LODs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "Meshes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "mesh": {
+                                            "default" : "",
+                                            "meta" : {
+                                               "user" : {
+                                                  "path" : {
+                                                     "folder" : false,
+                                                     "glob" : "*.vis"
+                                                  }
+                                               }
+                                            },
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "EDITOR_GenerateFur": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "PhysicsGD": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "EDITOR_MeshColliders": {
+                    "type": "array",
+                    "items": {
+                        "default" : "",
+                        "meta" : {
+                           "user" : {
+                              "path" : {
+                                 "folder" : false,
+                                 "glob" : "*.wphys"
+                              }
+                           }
+                        },
+                        "type": "string"
+                    }
+                },
+                "EDITOR_NavMeshStamper": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wphys"
+                          }
+                       }
+                    },
+                    "type": "string"
+                },
+                "EDITOR_MeshEdges" : {
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wphys"
+                          }
+                       }
+                    },
+                    "type" : "string"
+                }
+            },
+            "type": "object"
+        },
+        "EDITOR_Mesh" : {
+            "type": "object",
+            "properties": {
+                "path" : {
+                    "meta" : {
+                        "user" : {
+                            "path" : {
+                                "folder" : false,
+                                "glob" : "*.wphys"
+                            }
+                        }
+                    },
+                    "type" : "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "default": 0
+                }
+            }
+        },
+        "PhysicsDataGD" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "EDITOR_Shapes": {
+                    "type" : "array",
+                    "items" : {
+                        "$ref" : "#/definitions/EDITOR_Mesh"
+                    }
+                },
+                "EDITOR_isTrigger": {
+                    "type" : "boolean",
+                    "default": true
+                }
+            },
+            "type" : "object"
+        },
+        "AnimationControllerGD" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "EDITOR_skeleton": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wskl"
+                          }
+                       }
+                    },
+                    "type": "string"
+                }
+            }
+        },
+        "VoxelSimulationGD" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "EDITOR_voxelSize": {
+                    "default" : 4.0,
+                    "type": "number",
+                    "description" : "Set the voxel size of the regen cubes.",
+                    "title" : "Voxel Size"
+                }
+            }
+        },
+        "TerrainSurfaceObject" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "EDITOR_tso": {
+                    "default" : "",
+                    "meta" : {
+                       "user" : {
+                          "path" : {
+                             "folder" : false,
+                             "glob" : "*.wtso"
+                          }
+                       }
+                    },
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "TestEntityRef" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "TestRef": {
+                    "$ref": "#/definitions/EntityRef"
                 }
             },
             "type": "object"
@@ -101,6 +1045,29 @@
             },
             "type": "object"
         },
+        "TestCreature" : {
+            "properties" : {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "SklLush": {
+                    "$ref": "#/definitions/EntityRef"
+                },
+                "SklNeutral": {
+                    "$ref": "#/definitions/EntityRef"
+                },
+                "SklCursed": {
+                    "$ref": "#/definitions/EntityRef"
+                },
+                "FullLush": {
+                    "$ref": "#/definitions/EntityRef"
+                },
+                "FullCursed": {
+                    "$ref": "#/definitions/EntityRef"
+                }
+            },
+            "type": "object"
+        },
         "TestArrays" : {
             "properties" : {
                 "Super": {
@@ -140,6 +1107,83 @@
                     },
                     "minItems": 1,
                     "default": [0, 0]
+                }
+            },
+            "type": "object"
+        },
+        "EntityRef" : {
+            "type": "string"
+        },
+        "ThumbPath" : {
+            "meta" : {
+               "user" : {
+                  "path" : {
+                     "folder" : false,
+                     "glob" : "*.wthumb"
+                  }
+               }
+            },
+            "type": "string"
+        },
+        "CustomThumbnail": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Thumbnail": { "$ref": "#/definitions/ThumbPath" }
+            },
+            "type": "object"
+        },
+        "MultiThumbnail": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "List": {
+                    "type": "array",
+                    "items" : {
+                        "type": "object",
+                        "properties" : {
+                            "Tag" : {
+                                "type" : "string"
+                            },
+                            "EntityRef" : {
+                                "$ref": "#/definitions/EntityRef"
+                            },
+                            "EntityPath" : {
+                                "default" : "",
+                                "meta" : {
+                                   "user" : {
+                                      "path" : {
+                                         "folder" : false,
+                                         "glob" : "*.entity"
+                                      }
+                                   }
+                                },
+                                "type": "string"
+                            },
+                            "Thumbnail" : {
+                                "default" : "",
+                                "meta" : {
+                                   "user" : {
+                                      "path" : {
+                                         "folder" : false,
+                                         "glob" : "*.wthumb"
+                                      }
+                                   }
+                                },
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "NotVisibleInSubscene": {
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
                 }
             },
             "type": "object"
@@ -293,6 +1337,53 @@
 				}
             },
             "type": "object"
+        },
+        "CustomStreamingBehavior": {
+            "title": "Custom Streaming Behavior",
+            "description": "Allow user to specify custom streaming rule for this entity.",
+            "properties": {
+                "Super": {
+                    "$ref": "./RuntimeComponents.json#/definitions/ComponentGD"
+                },
+                "Ignore": {
+                    "title": "Ignore",
+                    "description": "Entity will be completely ignored from streaming system and will always be fully loaded and active.",
+                    "type": "boolean",
+                    "default": false
+                }
+            },
+            "type": "object"
+        },
+        "ReflectedMaterialBankConfig" : {
+            "properties" : {
+               "BankFiles" : {
+                  "description" : "The paths to the bank files to include in the material bank.",
+                  "items" : {
+                     "type" : "string"
+                  },
+                  "title" : "Bank Files",
+                  "type" : "array"
+               }
+            },
+            "type" : "object"
+        },
+        "Sequence": {
+            "properties": {
+                "EDITOR_Frames": {
+                    "description": "Frames exported by the tool",
+                    "type": "object",
+                    "properties": {
+                        "StartFrame": {
+                            "description": "First frame exported by the tool",
+                            "type": "integer"
+                        },
+                        "EndFrame": {
+                            "description": "Last frame exported by the tool",
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
         }
     }
 }

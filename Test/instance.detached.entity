@@ -126,6 +126,10 @@
             "Type": "SeedPatch"
         },
         {
+            "Data": {},
+            "Type": "SmoothScaleComponentGD"
+        },
+        {
             "Data": {
                 "NormalRatio": 0.6,
                 "ZOffset": 10.0

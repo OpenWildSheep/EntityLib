@@ -72,8 +72,7 @@ namespace Ent
         std::map<std::string, std::vector<std::string>> componentIncompatibilities;
 
         /// Load the EntityLib, given the path to the Tools directory
-        explicit EntityLib(
-            std::filesystem::path const& _rawdataPath, std::filesystem::path const& _schemaPath);
+        explicit EntityLib(std::filesystem::path _rawdataPath, std::filesystem::path const& _schemaPath);
         ~EntityLib();
         /// @cond PRIVATE
         EntityLib(EntityLib const&) = delete;

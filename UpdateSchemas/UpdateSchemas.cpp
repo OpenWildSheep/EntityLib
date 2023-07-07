@@ -1,4 +1,4 @@
-#include <ComponentMerge.h>
+#include <EntityLib/ComponentMerge.h>
 
 #include <ciso646>
 #include <filesystem>

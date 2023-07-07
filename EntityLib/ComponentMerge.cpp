@@ -1,6 +1,6 @@
-#include "include/ComponentMerge.h"
-#include "include/EntityLibCore.h"
-#include "include/EntityLib.h"
+#include "include/EntityLib/ComponentMerge.h"
+#include "include/EntityLib/EntityLibCore.h"
+#include "include/EntityLib/EntityLib.h"
 #include "ValidJson.h"
 
 #include <set>

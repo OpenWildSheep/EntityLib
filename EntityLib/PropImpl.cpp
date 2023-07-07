@@ -2,7 +2,7 @@
 
 #include <iso646.h>
 
-#include "include/EntityLib.h"
+#include "include/EntityLib/EntityLib.h"
 
 namespace Ent
 {

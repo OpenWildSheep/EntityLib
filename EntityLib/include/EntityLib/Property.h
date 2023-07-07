@@ -1,6 +1,6 @@
 #pragma once
 #include "../../PropImpl.h"
-#include "../EntityLib.h"
+#include "EntityLib.h"
 
 namespace Ent
 {

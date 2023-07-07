@@ -4,7 +4,7 @@
 #include <sstream>
 #include <ciso646>
 
-#include "include/EntityLibCore.h"
+#include "include/EntityLib/EntityLibCore.h"
 
 using namespace nlohmann;
 

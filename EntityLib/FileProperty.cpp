@@ -1,7 +1,7 @@
 #include "include/EntityLib/FileProperty.h"
 
 #include <ciso646>
-#include "include/EntityLib.h"
+#include "include/EntityLib/EntityLib.h"
 
 using namespace nlohmann;
 

@@ -12,8 +12,8 @@
 #pragma warning(pop)
 
 #include "Tools.h"
-#include "include/EntityLibCore.h"
-#include "include/Schema.h"
+#include "include/EntityLib/EntityLibCore.h"
+#include "include/EntityLib/Schema.h"
 
 /// \cond PRIVATE
 

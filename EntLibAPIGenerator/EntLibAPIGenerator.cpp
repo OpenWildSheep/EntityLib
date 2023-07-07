@@ -1,5 +1,5 @@
-#include <ComponentMerge.h>
-#include <EntityLib.h>
+#include <EntityLib/ComponentMerge.h>
+#include <EntityLib/EntityLib.h>
 
 #include <cassert>
 #include <ciso646>

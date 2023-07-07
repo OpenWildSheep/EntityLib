@@ -7,7 +7,7 @@
 #include "external/json.hpp"
 #pragma warning(pop)
 
-#include "include/Schema.h"
+#include "include/EntityLib/Schema.h"
 
 /// \cond PRIVATE
 

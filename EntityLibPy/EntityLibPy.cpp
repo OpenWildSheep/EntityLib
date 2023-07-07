@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <EntityLib.h>
+#include <EntityLib/EntityLib.h>
 #include <EntityLib/Property.h>
 #include <EntityLib/SearchProperty.h>
 

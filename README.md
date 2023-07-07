@@ -6,15 +6,11 @@
 - **Override** imported data
 - Generate **strong typed** C++/python class for easy and safe coding
 - Use **JSON schema** in VSCode for easy/safe manual edition
-# How to build ?
+# How to build
 ## The easy way
 Lets say you doesn't need the python binding or you have only one python installed:
  - Ensure you have **cmake** installed
  - Run the **build.bat** file. 
- - Then go in **build** and open **EntityLib.sln**.
- - Build **EntityLib**
- - Build **EntityLibPy** to get the python binding
- - Build **EntGenAPIGenerator** and run to get the strong typed API
 ## The hard way
 If you have several python installed and want to choose which one to use.
 - Ensure you have **cmake** installed and in you environment path
@@ -28,4 +24,27 @@ If you have several python installed and want to choose which one to use.
  - Build **EntityLibPy** to get the python binding
  - Build **EntGenAPIGenerator** and run to get the strong typed API
 You can do this for several python version on the same machine. Just change the target directory.
-
+# Run unit test
+### Merge Custom schemas with Engine schemas
+```
+"build/Release/UpdateSchemas.exe" -o build/Schemas -e DemoSchemas/EditionComponents.json,DemoSchemas/Scene-schema.json -r DemoSchemas/RuntimeComponents.json
+```
+This will also produce a json schemas file for each type in the subdirectory "all".
+This json schema files are usable as a validator for your data files in editors like VSCode or sublime text.
+### Generate the strong typed API
+```
+"build/Release/EntLibAPIGenerator.exe" -s build/Schemas -d build/EntGen -r EntLibAPIGenerator/resources
+```
+### Run unit test
+```
+cd Test
+"../build/Release/TestEntityDll.exe"
+```
+# How to use EntityLib in my own project ?
+- Build EntityLib ([How to build ?](#How-to-build))
+- If you want to use the python binding, build EntityLibPy
+- Write your schema files (or export them from your engine)
+- Merge your schemas (if more than one file) ([Merge Custom schemas with Engine schemas](#Merge-Custom-schemas-with-Engine-schemas))
+- Generate strong typed API (optional)  ([Generate the strong typed API](#Generate-the-strong-typed-API))
+- For a c++ project, link EntityLib.lib
+- For a python project, import EntityLibPy.pyd

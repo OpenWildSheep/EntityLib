@@ -71,6 +71,18 @@ TEST_CASE("Test Properties", "[all]")
         CHECK(items[1].makeAbsoluteNodeRef() == c.getProperty().makeAbsoluteNodeRef());
         CHECK(items[2].makeAbsoluteNodeRef() == b.getProperty().makeAbsoluteNodeRef());
     }
+    SECTION("Property::insertMapItem/IntKey")
+    {
+        auto source = Gen::Entity::create(entlib);
+        auto intIntMap = source.Components().addTestSetOfObject().MapOfIntInt().getProperty();
+        CHECK(intIntMap.empty());
+        intIntMap.insertMapItem(3);
+        CHECK(intIntMap.contains(3));
+        CHECK(intIntMap.size() == 1);
+        intIntMap.insertMapItem(4);
+        CHECK(intIntMap.contains(4));
+        CHECK(intIntMap.size() == 2);
+    }
     SECTION("Property Save/Load")
     {
         auto ent = entlib.newProperty(entlib.getSchema("Entity"));
@@ -218,7 +230,7 @@ TEST_CASE("Test Properties", "[all]")
 
     static constexpr auto PrefabSubEntityCount = 5;
 
-    SECTION("K")
+    SECTION("insertMapItem_wrong_enum_key")
     {
         // Check insert a key which is an enum, but with a wrong value.
         auto ent = Gen::Entity::create(entlib);

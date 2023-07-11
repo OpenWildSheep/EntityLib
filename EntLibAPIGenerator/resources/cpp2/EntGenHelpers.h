@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <filesystem>
 
-#include <EntityLib.h>
+#include <EntityLib/EntityLib.h>
 #include <EntityLib/Property.h>
 
 namespace Ent
@@ -455,7 +455,7 @@ namespace Ent
             return value;
         }
 
-        [[nodiscard]] inline char const* toInternal(String const& value)
+        [[nodiscard]] inline char const* toInternal(std::string const& value)
         {
             return value.c_str();
         }

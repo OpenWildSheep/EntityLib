@@ -1246,7 +1246,25 @@
                             {
                                 "type": "string"
                             }, 
-							{
+                            {
+                                "type": "integer"
+                            }
+                        ]
+                    }
+                },
+                "MapOfIntInt": {
+                    "meta" : {
+                       "ordered" : true,
+                       "overridePolicy" : "map"
+                    },
+                    "type": "array",
+                    "items":{
+                        "type": "array",
+                        "items": [
+                            {
+                                "type": "integer"
+                            }, 
+                            {
                                 "type": "integer"
                             }
                         ]

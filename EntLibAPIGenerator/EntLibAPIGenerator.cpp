@@ -757,7 +757,7 @@ void gencppProp(path const& _resourcePath, path const& _destinationPath)
 
 #pragma once
 
-#include <EntityLib.h>
+#include <EntityLib/EntityLib.h>
 #include "EntGenHelpers.h"
 
 namespace Ent

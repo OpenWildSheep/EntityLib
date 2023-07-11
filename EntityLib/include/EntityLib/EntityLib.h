@@ -185,7 +185,7 @@ namespace Ent
         mutable std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, HashPath>
             m_jsonDatabase;
         mutable std::vector<std::unique_ptr<VersionedJson>> m_tempJsonFiles;
-        String m_fallbackEntity;
+        std::string m_fallbackEntity;
         NewDepFileCallback m_newDepFileCallback;
         size_t m_globalDocumentsVersion = 0;
         std::filesystem::path m_schemaPath;

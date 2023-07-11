@@ -25,7 +25,7 @@ try
 
     // Test Set of Union
     [[maybe_unused]] auto ss = components.get<SubScene>(); // inferred type : SubScene
-    for (Ent::String const& key : components.getKeys())
+    for (std::string const& key : components.getKeys())
     {
         auto comp = components.get(key.c_str());
         std::cout << comp->getTypeName() << std::endl;

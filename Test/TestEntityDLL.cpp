@@ -57,6 +57,20 @@ TEST_CASE("Test Properties", "[all]")
         source.copyInto(target, CopyMode::MinimalOverride);
         CHECK(*source.getProperty().getRawJson() == *target.getProperty().getRawJson());
     }
+    SECTION("Property::getObjectSetItems")
+    {
+        auto source = Gen::Entity::create(entlib);
+        auto setOfObject = source.Components().addTestSetOfObject().SetOfObject();
+        auto a = setOfObject.add("Blue");
+        auto b = setOfObject.add("Yellow");
+        auto c = setOfObject.add("Red");
+
+        auto items = setOfObject.getProperty().getObjectSetItems();
+        CHECK(items.size() == 3);
+        CHECK(items[0].makeAbsoluteNodeRef() == a.getProperty().makeAbsoluteNodeRef());
+        CHECK(items[1].makeAbsoluteNodeRef() == c.getProperty().makeAbsoluteNodeRef());
+        CHECK(items[2].makeAbsoluteNodeRef() == b.getProperty().makeAbsoluteNodeRef());
+    }
     SECTION("Property Save/Load")
     {
         auto ent = entlib.newProperty(entlib.getSchema("Entity"));

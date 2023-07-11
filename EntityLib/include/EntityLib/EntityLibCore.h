@@ -191,115 +191,6 @@ namespace Ent
         }
     };
 
-    /// A string class which has the size of a pointer
-    struct String
-    {
-        std::unique_ptr<char[]> str;
-        String() = default;
-        String(char const* _str)
-        {
-            auto const len = strlen(_str);
-            str = std::make_unique<char[]>(len + 1);
-            strcpy_s(str.get(), len + 1, _str);
-        }
-        String(std::string const& _str)
-        {
-            auto const len = _str.size();
-            str = std::make_unique<char[]>(len + 1);
-            strcpy_s(str.get(), len + 1, _str.c_str());
-        }
-        String(String const& ot)
-        {
-            if (ot.str == nullptr)
-            {
-                return;
-            }
-            auto const len = ot.size();
-            str = std::make_unique<char[]>(len + 1);
-            strcpy_s(str.get(), len + 1, ot.str.get());
-        }
-        String& operator=(String const& ot)
-        {
-            if (ot.str == nullptr)
-            {
-                str.reset();
-            }
-            else
-            {
-                auto const len = ot.size();
-                str = std::make_unique<char[]>(len + 1);
-                strcpy_s(str.get(), len + 1, ot.str.get());
-            }
-            return *this;
-        }
-        String(String&& ot) = default;
-        String& operator=(String&& ot) = default;
-
-        bool operator==(String const& ot) const
-        {
-            if (str == nullptr)
-            {
-                return ot.size() == 0; // null and size 0 are identical in the std::string way
-            }
-            if (ot.str == nullptr)
-            {
-                return size() == 0;
-            }
-            return strcmp(str.get(), ot.str.get()) == 0;
-        }
-
-        bool operator!=(String const& ot) const
-        {
-            return !(*this == ot);
-        }
-
-        bool operator<(String const& ot) const
-        {
-            if (str == nullptr)
-            {
-                return ot.str != nullptr;
-            }
-            if (ot.str == nullptr)
-            {
-                return false;
-            }
-            return strcmp(str.get(), ot.str.get()) < 0;
-        }
-
-        [[nodiscard]] char const* c_str() const
-        {
-            return str == nullptr ? "" : str.get();
-        }
-
-        [[nodiscard]] size_t capacity() const
-        {
-            return size();
-        }
-
-        [[nodiscard]] size_t size() const
-        {
-            if (str == nullptr)
-            {
-                return 0;
-            }
-            return strlen(str.get());
-        }
-
-        [[nodiscard]] bool empty() const
-        {
-            return str == nullptr || size() == 0;
-        }
-
-        operator std::string() const
-        {
-            if (str == nullptr)
-            {
-                return {};
-            }
-            return std::string(str.get());
-        }
-    };
-
     /// Extremely simple memory pool. Not thread-safe and can't alloc array.
     /// Since there is millions of Nodes 1024 is not enought
     template <typename T, size_t BucketSize = 1024 * 1024>
@@ -556,7 +447,7 @@ namespace Ent
     struct EntityRef
     {
         /// @brief string representation of this entity ref, works like a file path, always relative.
-        String entityPath;
+        std::string entityPath;
 
         bool operator==(EntityRef const& _rho) const
         {

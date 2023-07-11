@@ -261,7 +261,6 @@ PYBIND11_MODULE(EntityLibPy, ent)
     auto pyOverrideValueSource = py::enum_<OverrideValueSource>(ent, "OverrideValueSource");
     auto pyCopyMode = py::enum_<CopyMode>(ent, "CopyMode");
     auto pyPath = py::class_<std::filesystem::path>(ent, "path");
-    auto pyEntString = py::class_<String>(ent, "String");
     auto pySubschema = py::class_<Subschema>(ent, "Subschema");
     auto pySubschemaRef = py::class_<SubschemaRef>(ent, "SubschemaRef");
     auto pySchema = py::class_<Schema>(ent, "Schema");
@@ -324,13 +323,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             return hash_value(path);
         });
 
-    pyEntString
-        .def(py::init<std::string>())
-        .def("__str__", [](String* str) { return static_cast<std::string>(*str); })
-        .def("__eq__", [](String& a, String& b) { return a == b; });
-
     py::implicitly_convertible<std::string, std::filesystem::path>();
-    py::implicitly_convertible<std::string, String>();
 
     pySubschemaBaseMeta
         .def_readonly("used_in_editor", &Subschema::BaseMeta::usedInEditor)

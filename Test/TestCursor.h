@@ -1,4 +1,4 @@
 #pragma once
-#include <EntityLib.h>
+#include <EntityLib/EntityLib.h>
 
 void testCursor(Ent::EntityLib& entlib);

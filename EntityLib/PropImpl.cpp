@@ -759,7 +759,7 @@ namespace Ent
             {
             case DataKind::entityRef: [[fallthrough]];
             case DataKind::string: return objectSetContains(std::get<std::string>(_key).c_str());
-            case DataKind::integer: return objectSetContains(std::get<size_t>(_key));
+            case DataKind::integer: return objectSetContains(std::get<int64_t>(_key));
             default: ENTLIB_LOGIC_ERROR("Unexpected key type");
             }
         }
@@ -769,7 +769,7 @@ namespace Ent
             {
             case DataKind::entityRef: [[fallthrough]];
             case DataKind::string: return mapContains(std::get<std::string>(_key).c_str());
-            case DataKind::integer: return mapContains(std::get<size_t>(_key));
+            case DataKind::integer: return mapContains(std::get<int64_t>(_key));
             default: ENTLIB_LOGIC_ERROR("Unexpected key type");
             }
         }
@@ -778,7 +778,7 @@ namespace Ent
             auto& itemType = schema->singularItems->get();
             switch (itemType.getDataKind())
             {
-            case DataKind::integer: return primSetContains(std::get<size_t>(_key));
+            case DataKind::integer: return primSetContains(std::get<int64_t>(_key));
             case DataKind::entityRef: [[fallthrough]];
             case DataKind::string: return primSetContains(std::get<std::string>(_key).c_str());
             default: ENTLIB_LOGIC_ERROR("Unexpected key type");

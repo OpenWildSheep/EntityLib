@@ -1,10 +1,9 @@
 #include "TestCursor.h"
 
 #include <catch.hpp>
-#include <EntityLib.h>
+#include <EntityLib/EntityLib.h>
 #include <../Tools.h>
 #include <fstream>
-#include <variant>
 #include <iostream>
 
 #include <EntityLib/Visitor.h>
@@ -31,7 +30,6 @@ public:
     }
     bool inObjectField([[maybe_unused]] Property const& _prop, char const* key) override
     {
-        // std::cout << "dksflghjdfjg" << getTab() << '"' << key << "\": " << std::endl;
         std::cout << getTab() << '"' << key << "\": " << std::endl;
         ++tab;
         return true;

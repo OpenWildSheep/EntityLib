@@ -36,7 +36,7 @@ namespace Ent
     struct ENTLIB_DLLEXPORT PropImpl
     {
     public:
-        using Key = std::variant<std::string, size_t>;
+        using Key = std::variant<std::string, int64_t>;
 
         PropImpl(EntityLib* _entityLib);
         PropImpl(PropImpl const&) = delete;

@@ -9,9 +9,9 @@
 #include <cxxopts.hpp>
 #pragma warning(pop)
 
-#include <EntityLib.h>
+#include <EntityLib/EntityLib.h>
 #include <EntGen.h>
-#include <ComponentMerge.h>
+#include <EntityLib/ComponentMerge.h>
 
 #include "TestCursor.h"
 
@@ -44,7 +44,7 @@ TEST_CASE("Test Properties", "[all]")
         CHECK_THROWS_AS(testLogicError(), std::logic_error);
         entlib.setLogicErrorPolicy(LogicErrorPolicy::Terminate);
     }
-    /*SECTION("copyInto")
+    SECTION("copyInto")
     {
         auto source = Gen::Entity::create(entlib);
         source.Components().addTestArrays().Variant().setPosition();
@@ -56,7 +56,7 @@ TEST_CASE("Test Properties", "[all]")
         auto target = Gen::Entity::create(entlib);
         source.copyInto(target, CopyMode::MinimalOverride);
         CHECK(*source.getProperty().getRawJson() == *target.getProperty().getRawJson());
-    }*/
+    }
     SECTION("Property Save/Load")
     {
         auto ent = entlib.newProperty(entlib.getSchema("Entity"));

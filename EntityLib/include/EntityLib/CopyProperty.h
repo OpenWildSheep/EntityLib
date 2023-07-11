@@ -42,8 +42,16 @@ namespace Ent
             {
                 switch (m_overrideValueSource)
                 {
-                case OverrideValueSource::OverrideOrPrefab: return not _source.isDefault();
-                case OverrideValueSource::Override: return _source.isSet();
+                case OverrideValueSource::OverrideOrPrefab:
+                {
+                    auto isDefault = _source.isDefault();
+                    return not isDefault;
+                }
+                case OverrideValueSource::Override:
+                {
+                    auto isSet = _source.isSet();
+                    return isSet;
+                }
                 case OverrideValueSource::Any: return true;
                 }
                 ENTLIB_LOGIC_ERROR("Wrong OverrideValueSource given to CopyProperty");
@@ -58,7 +66,15 @@ namespace Ent
                 {
                 case CopyMode::CopyOverride:
                     return _source.hasOverride() or not _source.sameValue(_back());
-                case CopyMode::MinimalOverride: return not _source.sameValue(_back());
+                case CopyMode::MinimalOverride:
+                {
+                    bool wasInParentsPRefab = false;
+                    if (auto prefab = _source.getParent()->getPrefab())
+                    {
+                        wasInParentsPRefab = prefab->contains(_source.getPathToken());
+                    }
+                    return not _source.sameValue(_back()) or not wasInParentsPRefab;
+                }
                 }
                 ENTLIB_LOGIC_ERROR("Wrong CopyMode given to CopyProperty");
             };
@@ -127,6 +143,10 @@ namespace Ent
         void inMapElement([[maybe_unused]] Property const& m_source, int64_t _key) override
         {
             _push(_back().forceGetMapItem(_key).first);
+            if (doNeedCopy(m_source))
+            {
+                _back().buildPath(); // Force it to set
+            }
         }
         void outMapElement([[maybe_unused]] Property const& m_source) override
         {

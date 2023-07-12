@@ -14,7 +14,7 @@ namespace Ent
         std::vector<Property> m_dest;
         OverrideValueSource m_overrideValueSource = {};
         CopyMode m_copyMode = {};
-        bool m_copyRootInstanceOf = false;
+        bool m_copyRootInstanceOf = true;
 
         [[nodiscard]] Property const& _back()
         {

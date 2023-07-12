@@ -28,12 +28,14 @@ namespace Ent
         [[maybe_unused]] CopyMode _copyMode,
         [[maybe_unused]] OverrideValueSource _overrideValueSource,
         [[maybe_unused]] bool _copyRootInstanceOf) const
+    try
     {
         CopyProperty copier(_dest, _overrideValueSource, _copyMode, _copyRootInstanceOf);
         visitRecursive(*this, copier);
     }
-
+    ENTLIB_PROP_CATCH
     Property Property::detach()
+    try
     {
         auto& jsonFile = getEntityLib()->createTempJsonFile(getSchema()->name.c_str());
         Property detached(getEntityLib()->newPropImpl(
@@ -43,8 +45,9 @@ namespace Ent
         visitRecursive(*this, copier);
         return detached;
     }
-
+    ENTLIB_PROP_CATCH
     Property Property::clone()
+    try
     {
         if (auto prefab = getPimpl().getPrefab())
         {
@@ -64,8 +67,9 @@ namespace Ent
         visitRecursive(*this, copier);
         return copy;
     }
-
+    ENTLIB_PROP_CATCH
     void Property::applyToPrefab()
+    try
     {
         // Have to remove removed items in arrays
         auto const prefabSource = getPrefab();
@@ -86,6 +90,7 @@ namespace Ent
             getObjectField(field).unset();
         }
     }
+    ENTLIB_PROP_CATCH
 
     Property Property::mapRename(char const* _current, char const* _new)
     try
@@ -98,11 +103,7 @@ namespace Ent
         visitRecursive(*currentItem, copier);
         return newItem;
     }
-    catch (ContextException& ex)
-    {
-        ex.addContextMessage(getDebugString());
-        throw;
-    }
+    ENTLIB_PROP_CATCH
     Property Property::mapRename(int64_t _current, int64_t _new) const
     try
     {
@@ -114,12 +115,9 @@ namespace Ent
         eraseMapItem(_current);
         return newItem;
     }
-    catch (ContextException& ex)
-    {
-        ex.addContextMessage(getDebugString());
-        throw;
-    }
+    ENTLIB_PROP_CATCH
     Property Property::unionSetRename(char const* _current, char const* _new) const
+    try
     {
         auto newItem = insertUnionSetItem(_new);
         CopyProperty copier(
@@ -129,6 +127,7 @@ namespace Ent
         eraseUnionSetItem(_current);
         return newItem;
     }
+    ENTLIB_PROP_CATCH
 
     std::map<char const*, Property, CmpStr> Property::getMapStringItems() const
     try
@@ -140,11 +139,7 @@ namespace Ent
         }
         return result;
     }
-    catch (ContextException& ex)
-    {
-        ex.addContextMessage(getDebugString());
-        throw;
-    }
+    ENTLIB_PROP_CATCH
 
     std::map<int64_t, Property> Property::getMapIntItems() const
     try
@@ -156,12 +151,10 @@ namespace Ent
         }
         return result;
     }
-    catch (ContextException& ex)
-    {
-        ex.addContextMessage(getDebugString());
-        throw;
-    }
+    ENTLIB_PROP_CATCH
+
     std::vector<Property> Property::getObjectSetItems() const
+    try
     {
         std::vector<Property> result;
         auto const keyKind = getPimpl().getObjectSetKeyKind();
@@ -185,8 +178,10 @@ namespace Ent
         }
         return result;
     }
+    ENTLIB_PROP_CATCH
 
     std::map<char const*, Property, CmpStr> Property::getUnionSetItems() const
+    try
     {
         std::map<char const*, Property, CmpStr> result;
         for (auto&& [key, schema] : getPimpl().getUnionSetKeysString())
@@ -195,6 +190,7 @@ namespace Ent
         }
         return result;
     }
+    ENTLIB_PROP_CATCH
 
     std::vector<PrefabInfo> getPrefabHistory(Property const& _prop)
     {
@@ -213,6 +209,7 @@ namespace Ent
     }
 
     char const* Property::getDebugString() const
+    try
     {
         auto getIsSetLevel = [](Property const& _prop)
         {
@@ -249,4 +246,5 @@ namespace Ent
         return staticFormat(
             R"("%s" - "%s")", histories[0].prefabPath.c_str(), histories[0].nodeRef.c_str());
     }
+    ENTLIB_PROP_CATCH
 } // namespace Ent

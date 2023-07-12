@@ -90,6 +90,39 @@ TEST_CASE("Test Properties", "[all]")
         auto copy = entlib.loadProperty("test_output/test_create2.entity");
         CHECK(*ent.getRawJson() == *copy.getRawJson());
     }
+    SECTION("Test NodeRef in error message")
+    {
+        // Ensure that error message contains the file name and NodeRef
+        auto&& entJson = entlib.createTempJsonFile("Entity");
+        entJson.document["Name"] = 45;
+        entJson.document["Components"] = 45;
+        auto filename = "test_wrong_type.entity";
+        auto entProp = Property(&entlib, entlib.getSchema("Entity"), filename, entJson);
+        auto name = entProp.getObjectField("Name");
+        auto comp = entProp.getObjectField("Components");
+        std::string errorMessage;
+        try
+        {
+            [[maybe_unused]] auto str = name.getString();
+        }
+        catch (ContextException& ex)
+        {
+            errorMessage = ex.what();
+        }
+        CHECK(errorMessage.find(filename) != std::string::npos);
+        CHECK(errorMessage.find("Name") != std::string::npos);
+        std::string errorMessage2;
+        try
+        {
+            [[maybe_unused]] auto itemMap = comp.getUnionSetItems();
+        }
+        catch (ContextException& ex)
+        {
+            errorMessage2 = ex.what();
+        }
+        CHECK(errorMessage2.find(filename) != std::string::npos);
+        CHECK(errorMessage2.find("Components") != std::string::npos);
+    }
     SECTION("Entity Save/Load")
     {
         auto ent = Gen::Entity::create(entlib);

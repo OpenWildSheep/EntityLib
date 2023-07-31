@@ -1913,7 +1913,7 @@ namespace Ent
                 {
                     return _key;
                 }
-                else if constexpr (std::is_same_v<KeyType, int64_t>)
+                else if constexpr (std::is_integral_v<KeyType>)
                 {
                     char buff[64];
                     snprintf(buff, sizeof(buff), "%lld", static_cast<int64_t>(_key));

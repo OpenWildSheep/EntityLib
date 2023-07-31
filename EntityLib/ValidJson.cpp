@@ -238,7 +238,7 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
     {
         auto fetchedRoot = std::make_unique<json>();
         char buff[1024] = {};
-        sprintf_s(
+        snprintf(
             buff,
             std::size(buff),
             "%s/%s",

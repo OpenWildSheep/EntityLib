@@ -52,7 +52,7 @@ namespace Ent
     char const* staticFormat(char const* message, Args&&... args)
     {
         thread_local static char buffer[2048];
-        sprintf_s(buffer, sizeof(buffer), message, std::forward<Args>(args)...);
+        snprintf(buffer, sizeof(buffer), message, std::forward<Args>(args)...);
         return buffer;
     }
 
@@ -84,7 +84,7 @@ namespace Ent
         Args&&... args)
     {
         char mess[1024]; // format string are usually short
-        sprintf_s(mess, sizeof(mess), "%s%s\n", "%s%s(%ld) : ", _message);
+        snprintf(mess, sizeof(mess), "%s%s\n", "%s%s(%ld) : ", _message);
         fprintfmt(_output, mess, _category, _file, _line, std::forward<Args>(args)...);
     }
 

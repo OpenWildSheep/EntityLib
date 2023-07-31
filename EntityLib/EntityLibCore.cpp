@@ -23,7 +23,7 @@ namespace Ent
         [[maybe_unused]] std::filesystem::path const& _basePath, std::filesystem::path const& _rel)
     {
         thread_local static char buffer[2048];
-        sprintf_s(buffer, sizeof(buffer), R"("%s")", _rel.generic_string().c_str());
+        snprintf(buffer, sizeof(buffer), R"("%s")", _rel.generic_string().c_str());
         return buffer;
     }
 
@@ -68,7 +68,7 @@ namespace Ent
     {
         static constexpr auto InitBuffSize = 4096;
         thread_local static char buffer[InitBuffSize] = {0};
-        sprintf_s(
+        snprintf(
             buffer,
             InitBuffSize,
             R"msg(%s - %s : %s)msg",

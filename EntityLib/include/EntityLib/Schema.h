@@ -73,6 +73,44 @@ namespace Ent
     struct SubschemaRef;
     class Schema;
 
+    namespace SubSchemaMetaData
+    {
+        // Meta informations
+        /// Store metadata for any type
+        struct BaseMeta
+        {
+            bool usedInEditor = true; ///< Does this Subschema exists in edition context ?
+            bool usedInRuntime = true; ///< Does this Subschema exists in runtime context ?
+            bool deprecated = false; ///< Is this Subschema deprecated ?
+        };
+        /// Store metadata for numeric type
+        struct NumberMeta : BaseMeta
+        {
+            uint32_t bitDepth = 32; ///< Bit depth of this number, either 8, 16, 32 or 64
+            bool isSigned = true; ///< is this number signed ?
+        };
+        /// Store metadata for union type (oneOf in json schema)
+        struct UnionMeta : BaseMeta
+        {
+            std::string dataField; ///< Name of the field containing the data (ex : classData)
+            std::string typeField; ///< Name of the field containing the type of the data (ex : className)
+            std::optional<std::string> indexField; ///< Name of the field containing the index of the type
+        };
+        /// Store metadata for array type
+        struct ArrayMeta : BaseMeta
+        {
+            std::string overridePolicy; ///< Policy used to override the array from the prefab
+            bool ordered = true;
+            bool isMapItem = false; ///< Can't be discarded at write (neither null)
+            std::optional<std::string> keyField;
+        };
+        /// Store metadata for all schema which doesn't have specific field
+        struct GenericMeta : BaseMeta
+        {
+        };
+
+    }; // namespace SubSchemaMetaData
+
     /// Definition of a json Node
     struct ENTLIB_DLLEXPORT Subschema
     {
@@ -120,39 +158,12 @@ namespace Ent
         /// @brief Fast lookup in union types
         std::map<std::string, UnionSubTypeInfo> unionTypeMap;
 
-        // Meta informations
-        /// Store metadata for any type
-        struct BaseMeta
-        {
-            bool usedInEditor = true; ///< Does this Subschema exists in edition context ?
-            bool usedInRuntime = true; ///< Does this Subschema exists in runtime context ?
-            bool deprecated = false; ///< Is this Subschema deprecated ?
-        };
-        /// Store metadata for numeric type
-        struct NumberMeta : BaseMeta
-        {
-            uint32_t bitDepth = 32; ///< Bit depth of this number, either 8, 16, 32 or 64
-            bool isSigned = true; ///< is this number signed ?
-        };
-        /// Store metadata for union type (oneOf in json schema)
-        struct UnionMeta : BaseMeta
-        {
-            std::string dataField; ///< Name of the field containing the data (ex : classData)
-            std::string typeField; ///< Name of the field containing the type of the data (ex : className)
-            std::optional<std::string> indexField; ///< Name of the field containing the index of the type
-        };
-        /// Store metadata for array type
-        struct ArrayMeta : BaseMeta
-        {
-            std::string overridePolicy; ///< Policy used to override the array from the prefab
-            bool ordered = true;
-            bool isMapItem = false; ///< Can't be discarded at write (neither null)
-            std::optional<std::string> keyField;
-        };
-        /// Store metadata for all schema which doesn't have specific field
-        struct GenericMeta : BaseMeta
-        {
-        };
+        using BaseMeta = SubSchemaMetaData::BaseMeta;
+        using ArrayMeta = SubSchemaMetaData::ArrayMeta;
+        using GenericMeta = SubSchemaMetaData::GenericMeta;
+        using NumberMeta = SubSchemaMetaData::NumberMeta;
+        using UnionMeta = SubSchemaMetaData::UnionMeta;
+
         /// Meta data for any type of Node
         using Meta = std::variant<GenericMeta, NumberMeta, UnionMeta, ArrayMeta>;
         Meta meta{}; ///< Contains meta data for any type of Node

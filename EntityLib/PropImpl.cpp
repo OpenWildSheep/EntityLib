@@ -1903,7 +1903,7 @@ namespace Ent
         return rootParent->sharedFromThis();
     }
 
-    static [[nodiscard]] std::string keyToString(FileProperty::Key _key)
+    [[nodiscard]] static std::string keyToString(FileProperty::Key _key)
     {
         return std::visit(
             [](auto const& _key)
@@ -1916,7 +1916,7 @@ namespace Ent
                 else if constexpr (std::is_same_v<KeyType, int64_t>)
                 {
                     char buff[64];
-                    _ltoa_s(static_cast<long>(_key), buff, 10);
+                    snprintf(buff, sizeof(buff), "%lld", static_cast<int64_t>(_key));
                     return std::string(buff);
                 }
                 else

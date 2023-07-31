@@ -291,8 +291,8 @@ In node \: \<root\>(\/\[Objects\]\/\[\d+\]|\/\[Components\]\/\[\d+\]\/\[Data\]\/
         char const* rootName)
     {
         // valid the scene using schema
-        strcpy_s(
-            schemaPath, sizeof(schemaPath), (_toolsDir / "WildPipeline/Schema").u8string().c_str());
+        strncpy(
+            schemaPath, (_toolsDir / "WildPipeline/Schema").u8string().c_str(), sizeof(schemaPath));
 
         json fullSceneInstanceSchema = createValidationSchema(_schema);
         fullSceneInstanceSchema["$ref"] = std::string("#/definitions/") + rootName;

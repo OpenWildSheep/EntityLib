@@ -14,7 +14,7 @@ project(EntityLib)
 set(CMAKE_CXX_STANDARD 17)
 
 if( MSVC)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4 /WX /wd\"4273\" /wd\"4324\" /wd\"4251\" /wd\"4625\" /wd\"4626\" /wd\"4820\" /wd\"4710\" /wd\"4711\" /wd\"4714\" /wd\"4514\" /wd\"4774\" /wd\"4571\" /wd\"4868\" /wd\"5026\" /wd\"5027\" /wd\"4623\"")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4 /WX /wd\"4996\" /wd\"4273\" /wd\"4324\" /wd\"4251\" /wd\"4625\" /wd\"4626\" /wd\"4820\" /wd\"4710\" /wd\"4711\" /wd\"4714\" /wd\"4514\" /wd\"4774\" /wd\"4571\" /wd\"4868\" /wd\"5026\" /wd\"5027\" /wd\"4623\"")
 endif()
 
 file(GLOB ENTITYLIB_SOURCES "EntityLib/*.cpp")

@@ -1903,6 +1903,14 @@ namespace Ent
         return rootParent->sharedFromThis();
     }
 
+    template <typename T, bool Valid>
+    struct StaticAssert;
+
+    template <typename T>
+    struct StaticAssert<T, true>
+    {
+    };
+
     [[nodiscard]] static std::string keyToString(FileProperty::Key _key)
     {
         return std::visit(
@@ -1913,7 +1921,7 @@ namespace Ent
                 {
                     return _key;
                 }
-                else if constexpr (std::is_integral_v<KeyType>)
+                else if constexpr (std::is_same_v<KeyType, int64_t>)
                 {
                     char buff[64];
                     snprintf(buff, sizeof(buff), "%lld", static_cast<int64_t>(_key));
@@ -1921,14 +1929,15 @@ namespace Ent
                 }
                 else
                 {
-                    static_assert(false, "Unknown type in FileProperty::Key");
+                    // g++ build this line even if the is is true, so a static assert fail
+                    StaticAssert<KeyType, false>{}; // "Unknown type in FileProperty::Key"
                 }
             },
             _key);
     }
 
     // Get the path from _root to _child, but reversed.
-    static [[nodiscard]] std::vector<std::string>
+    [[nodiscard]] static std::vector<std::string>
     makeNodeRefReversed(PropImpl const* _root, PropImpl const& _child)
     {
         PropImplPtr propPtr = _child.sharedFromThis();

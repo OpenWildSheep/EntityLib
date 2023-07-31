@@ -113,7 +113,7 @@ namespace Ent
     {                                                                                              \
         ::Ent::logError(__FILE__, __LINE__, __VA_ARGS__);                                          \
         if (Ent::s_LogicErrorPolicy == Ent::LogicErrorPolicy::Terminate)                           \
-            terminate();                                                                           \
+            std::terminate();                                                                      \
         else                                                                                       \
             throw std::logic_error(Ent::format(__VA_ARGS__));                                      \
     } while (0)
@@ -126,7 +126,7 @@ namespace Ent
     {                                                                                              \
         ::Ent::logError(__FILE__, __LINE__, __VA_ARGS__);                                          \
         if (Ent::s_LogicErrorPolicy == Ent::LogicErrorPolicy::Terminate)                           \
-            terminate();                                                                           \
+            std::terminate();                                                                      \
     } while (0)
 
 #define ENTLIB_LOG(...) (void)((::Ent::log(__FILE__, __LINE__, stdout, "", __VA_ARGS__), 0))

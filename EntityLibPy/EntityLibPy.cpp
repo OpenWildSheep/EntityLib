@@ -610,7 +610,7 @@ PYBIND11_MODULE(EntityLibPy, ent)
             }
             catch (const std::filesystem::filesystem_error& e)
             {
-                PyErr_SetString(PyExc_IOError, Ent::convertANSIToUTF8(e.what()).c_str());
+                PyErr_SetString(PyExc_IOError, convertANSIToUTF8(e.what()).c_str());
             }
         });
 }

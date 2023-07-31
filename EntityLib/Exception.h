@@ -178,6 +178,7 @@ inline WrapperException::WrapperException(
     addContextMessage(_message, std::forward<Args>(_args)...);
 }
 
+#ifdef _WIN32
 extern "C"
 {
     __declspec(dllimport) int MultiByteToWideChar(
@@ -221,6 +222,12 @@ inline std::string convertANSIToUTF8(std::string const& message)
     result.resize((size_t)convertResult);
     return result;
 }
+#else
+inline std::string convertANSIToUTF8(std::string message)
+{
+    return message;
+}
+#endif
 
 inline char const* makeWhatMessage(
     std::string const& msg,

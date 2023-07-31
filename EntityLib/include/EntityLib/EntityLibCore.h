@@ -231,8 +231,6 @@ namespace Ent
         }
     };
 
-    std::string convertANSIToUTF8(std::string const& _message);
-
     char const* formatPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
 
     struct InvalidKey : std::logic_error

@@ -512,7 +512,7 @@ TEST_CASE("Test Properties2", "[all2]")
                         ->getObjectField("Position")
                         .getArrayItem(2llu)
                         .getFloat();
-        ENTLIB_ASSERT(fabs(pos2 - 29.6635) < FLT_EPSILON);
+        ENTLIB_ASSERT(fabs(pos2 - 29.6635) < std::numeric_limits<float>::epsilon());
         ENTLIB_ASSERT(
             expl.getObjectField("Components")
                 .getUnionSetItem("SubScene")
@@ -531,7 +531,8 @@ TEST_CASE("Test Properties2", "[all2]")
         auto components = expl.getObjectField("Components");
         auto ori3 =
             components.getUnionSetItem("TransformGD")->getObjectField("Orientation").getArrayItem(3llu);
-        ENTLIB_ASSERT(fabs(ori3.getFloat() - 0.9916236400604248) < FLT_EPSILON);
+        ENTLIB_ASSERT(
+            fabs(ori3.getFloat() - 0.9916236400604248) < std::numeric_limits<float>::epsilon());
         ori3.setFloat(2.);
         ENTLIB_ASSERT(ori3.getFloat() == 2.);
         auto soundAreaGD =

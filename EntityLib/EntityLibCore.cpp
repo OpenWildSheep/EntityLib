@@ -2,9 +2,11 @@
 
 #include <system_error>
 
+#if defined(_MSC_VER)
 #pragma warning(push, 0)
 #include <windows.h>
 #pragma warning(pop)
+#endif
 
 namespace Ent
 {
@@ -13,10 +15,12 @@ namespace Ent
     void fprintfImpl(FILE* file, char const* message)
     {
         fprintf(file, message);
+#if defined(_MSC_VER)
         if (IsDebuggerPresent() != 0)
         {
             OutputDebugStringA(message);
         }
+#endif
     }
 
     char const* formatPath(

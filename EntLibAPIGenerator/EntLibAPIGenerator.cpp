@@ -93,12 +93,14 @@ void createFile(
 )
 {
     auto const destinationPathAbsolute = absolute(_destinationPath);
-    if (destinationPathAbsolute.native().size() < 255) // Can't write filename longer than 255 characters
+    if (destinationPathAbsolute.generic_u32string().size()
+        < 255) // Can't write filename longer than 255 characters
     {
         create_directories(_destinationPath.parent_path());
         auto const tempPath = temp_directory_path() / "temp.py";
         auto const tempPathAbsolute = absolute(tempPath);
-        if (tempPathAbsolute.native().size() < 255) // Can't access filename longer than 255 characters
+        if (tempPathAbsolute.generic_u32string().size()
+            < 255) // Can't access filename longer than 255 characters
         {
             {
                 std::ofstream output = openOfstream(tempPathAbsolute);

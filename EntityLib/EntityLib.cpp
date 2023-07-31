@@ -38,7 +38,7 @@ namespace Ent
         std::filesystem::path c;
         for (auto const& iter : _path)
         {
-            if (iter.native() == L"..")
+            if (iter.string() == "..")
             {
                 if (c.empty())
                 {
@@ -49,23 +49,23 @@ namespace Ent
                     c = c.parent_path();
                 }
             }
-            else if (iter.native() != L".")
+            else if (iter.string() != ".")
             {
                 c /= iter;
             }
         }
-        if (c.native().back() == L':')
+        if (c.string().back() == ':')
         {
-            c = (c.native() + L'/');
+            c = (c.string() + '/');
         }
         return c.make_preferred();
     }
 
     EntityLib::EntityLib(std::filesystem::path _rawdataPath, std::filesystem::path const& _schemaPath)
     {
-        if ((_rawdataPath.native().back() != L'/') || (_rawdataPath.native().back() != L'\\'))
+        if ((_rawdataPath.string().back() != '/') || (_rawdataPath.string().back() != '\\'))
         {
-            _rawdataPath = (_rawdataPath.native() + L'/');
+            _rawdataPath = (_rawdataPath.string() + '/');
         }
 
         auto getAbsPath = [this](auto const& _path)

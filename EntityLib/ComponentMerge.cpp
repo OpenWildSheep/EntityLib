@@ -208,7 +208,8 @@ namespace Ent
             std::replace(begin(escapedName), end(escapedName), '>', '_');
             std::replace(begin(escapedName), end(escapedName), '<', '_');
             auto const schemaPath = allSingleSchemaPath / (escapedName + ".json");
-            if (schemaPath.native().size() < 255) // Can't write filename longer than 255 characters
+            if (schemaPath.generic_u32string().size()
+                < 255) // Can't write filename longer than 255 characters
             {
                 json singleSchema;
                 singleSchema["$ref"] = "../TextEditorsSchema.json#/definitions/" + name;

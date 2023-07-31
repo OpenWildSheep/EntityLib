@@ -763,7 +763,7 @@ namespace Ent
                 return getProperty().empty();
             }
 
-            [[nodiscard]] void clear()
+            void clear()
             {
                 getProperty().clear();
             }

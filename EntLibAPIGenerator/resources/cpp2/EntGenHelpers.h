@@ -176,7 +176,7 @@ namespace Ent
             }
             void pop_back()
             {
-                getProperty().pop();
+                getProperty().popBack();
             }
             void clear()
             {
@@ -196,14 +196,11 @@ namespace Ent
             {
             }
 
-            template <typename T, std::size_t... Is>
-            void copyFromTuple(T const& rho, std::index_sequence<Is...>)
+            template <typename U, std::size_t... Is>
+            void copyFromTuple(U const& rho, std::index_sequence<Is...>)
             {
                 ((*this)[Is].set(std::get<Is>(rho)), ...);
             }
-
-            template <typename T>
-            struct What;
 
             template <typename V>
             PrimArray<T>& operator=(V const& rho)

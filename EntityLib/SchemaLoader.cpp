@@ -442,9 +442,9 @@ namespace Ent
 
     // TODO Loïc : (Low prio) It could be good to use a real logger system. (like spdlog for example)
 #ifdef ENTLIB_DEBUG_READSCHEMA
-#define ENTLIB_DEBUG_PRINTF(message, ...) printf(message, __VA_ARGS__);
+#define ENTLIB_DEBUG_PRINTF(...) printf(__VA_ARGS__);
 #else
-#define ENTLIB_DEBUG_PRINTF(message, ...)
+#define ENTLIB_DEBUG_PRINTF(...)
 #endif
 
     DataKind computeDataKind(Subschema const& _subschema)

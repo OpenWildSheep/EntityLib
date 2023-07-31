@@ -310,7 +310,7 @@ namespace Ent
             return getPimpl().empty();
         }
         ENTLIB_PROP_CATCH
-        [[nodiscard]] void clear() const ///< Make the array empty
+        void clear() const ///< Make the array empty
         try
         {
             getPimpl().clear();

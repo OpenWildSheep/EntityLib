@@ -89,7 +89,7 @@ namespace Ent
 
         struct HashPath
         {
-            auto operator()(std::filesystem::path const& p) const;
+            size_t operator()(std::filesystem::path const& p) const noexcept;
         };
         std::unordered_map<std::filesystem::path, std::unique_ptr<VersionedJson>, HashPath> const&
         getJsonDatabase() const;

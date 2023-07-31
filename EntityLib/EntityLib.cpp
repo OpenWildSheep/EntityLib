@@ -672,7 +672,7 @@ namespace Ent
         return _path;
     }
 
-    auto EntityLib::HashPath::operator()(std::filesystem::path const& p) const
+    size_t EntityLib::HashPath::operator()(std::filesystem::path const& p) const noexcept
     {
         return hash_value(p);
     }

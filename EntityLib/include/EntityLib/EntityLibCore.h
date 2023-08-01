@@ -330,23 +330,6 @@ namespace Ent
         explicit InvalidJsonData(char const* _message); ///< ctor
     };
 
-    /// Use FileSystemError rather than filesystem_error, since
-    ///     - It will convert the message charset into utf8
-    ///     - It will print the path as expected in Wild tools
-    struct FileSystemError : ContextException
-    {
-        FileSystemError(
-            std::string const& _msg,
-            std::filesystem::path const& _rootPath,
-            std::filesystem::path const& _relPath,
-            std::error_code _error);
-
-        /// This ctor will use the errno as error_code
-        FileSystemError(
-            std::string const& _msg,
-            std::filesystem::path const& _rootPath,
-            std::filesystem::path const& _relPath);
-    };
 
     /// Exception thrown when some json data are invalid
     struct CantRename : ContextException

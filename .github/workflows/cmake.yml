@@ -1,5 +1,5 @@
 ---
-name: CMake
+name: cmake_linux_macos
 on:
   push:
     branches:

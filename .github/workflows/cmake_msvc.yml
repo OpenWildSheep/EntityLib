@@ -1,5 +1,5 @@
 ---
-name: CMake
+name: cmake_msvc
 on:
   push:
     branches:

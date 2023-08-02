@@ -339,9 +339,9 @@ namespace Ent
 
     std::optional<Property> EntityLib::getParentEntity(Property const& _node) const
     {
-        if (auto* const parent = _node.getPimpl().getParent().get())
+        if (auto const& parent = _node.getPimpl().getParent())
         {
-            if (auto ptr = getSceneParentEntity(parent))
+            if (auto ptr = getSceneParentEntity(parent.get()))
             {
                 return Property{std::move(ptr)};
             }

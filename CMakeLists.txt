@@ -42,10 +42,24 @@ target_include_directories(EntLibAPIGenerator PRIVATE EntLibAPIGenerator/externa
 target_include_directories(EntLibAPIGenerator PRIVATE submodules/cxxopts/include)
 target_link_libraries(EntLibAPIGenerator EntityLib)
 
+file(GLOB UPDATESCHEMA_SOURCES "UpdateSchemas/*.cpp" "UpdateSchemas/*.h" "UpdateSchemas/*.hpp")
+add_executable(UpdateSchemas ${UPDATESCHEMA_SOURCES})
+target_include_directories(UpdateSchemas PRIVATE submodules/cxxopts/include)
+target_link_libraries(UpdateSchemas EntityLib)
+
+add_custom_target(BuildAllButUnitTests)
+add_dependencies(BuildAllButUnitTests EntityLib)
+add_dependencies(BuildAllButUnitTests EntityLibPy)
+add_dependencies(BuildAllButUnitTests EntLibAPIGenerator)
+add_dependencies(BuildAllButUnitTests UpdateSchemas)
+
+enable_testing()
+
 file(GLOB TESTENTGEN_SOURCES "TestEntGen/*.cpp" "TestEntGen/*.h" "TestEntGen/*.hpp")
 add_executable(TestEntGen ${TESTENTGEN_SOURCES})
 target_include_directories(TestEntGen PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/EntGen/cpp2)
 target_link_libraries(TestEntGen EntityLib)
+add_test(TestEntGen TestEntGen)
 
 file(GLOB TESTENTITYLIB_SOURCES "Test/*.cpp" "Test/*.h" "Test/*.hpp")
 add_executable(TestEntityDLL ${TESTENTITYLIB_SOURCES})
@@ -53,8 +67,4 @@ target_include_directories(TestEntityDLL PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/Ent
 target_include_directories(TestEntityDLL PRIVATE submodules/cxxopts/include)
 target_include_directories(TestEntityDLL PRIVATE external/catch)
 target_link_libraries(TestEntityDLL EntityLib)
-
-file(GLOB UPDATESCHEMA_SOURCES "UpdateSchemas/*.cpp" "UpdateSchemas/*.h" "UpdateSchemas/*.hpp")
-add_executable(UpdateSchemas ${UPDATESCHEMA_SOURCES})
-target_include_directories(UpdateSchemas PRIVATE submodules/cxxopts/include)
-target_link_libraries(UpdateSchemas EntityLib)
+add_test(TestEntityDLL TestEntityDLL)

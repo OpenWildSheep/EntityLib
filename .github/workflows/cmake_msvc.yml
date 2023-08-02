@@ -26,15 +26,9 @@ jobs:
         run: cmake -B ${{github.workspace}}/build
           -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
           -DCMAKE_CXX_STANDARD=${{matrix.cppstd}}
-      - name: Build EntLibAPIGenerator
+      - name: Build EntityLib (and other tools)
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
-          --target EntLibAPIGenerator
-      - name: Build UpdateSchemas
-        run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
-          --target UpdateSchemas
-      - name: Build EntityLibPy
-        run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
-          --target EntityLibPy
+          --target BuildAllButUnitTests
       - name: Merge UnitTest Schemas
         run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/UpdateSchemas -o build/Schemas -e
           DemoSchemas/EditionComponents.json,DemoSchemas/Scene-schema.json -r
@@ -43,7 +37,7 @@ jobs:
         run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/EntLibAPIGenerator -s build/Schemas -d build/EntGen -r
           EntLibAPIGenerator/resources
       - name: Build Unit tests
-        run: cmake --build build --config ${{matrix.BUILD_TYPE}} --target TestEntityDLL
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
       - name: Run Unit tests
         working-directory: ${{github.workspace}}/Test
         run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/TestEntityDLL

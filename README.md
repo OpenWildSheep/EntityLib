@@ -6,6 +6,9 @@
 - **Override** imported data
 - Generate **strong typed** C++/python class for easy and safe coding
 - Use **JSON schema** in VSCode for easy/safe manual edition
+# Continuous integration
+- windows: ![CI badge](https://github.com/OpenWildSheep/EntityLib/actions/workflows/cmake_msvc.yml/badge.svg)
+- linux/macos ![CI badge](https://github.com/OpenWildSheep/EntityLib/actions/workflows/cmake.yml/badge.svg)
 # How to build
 Ensure to checkout all git submodules :
 ```sh

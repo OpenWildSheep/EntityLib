@@ -36,14 +36,14 @@ jobs:
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
           --target EntityLibPy
       - name: Merge UnitTest Schemas
-        run: ${{github.workspace}}/build/Release/UpdateSchemas.exe -o build/Schemas -e
+        run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/UpdateSchemas -o build/Schemas -e
           DemoSchemas/EditionComponents.json,DemoSchemas/Scene-schema.json -r
           DemoSchemas/RuntimeComponents.json
       - name: Generate EntGen API
-        run: ${{github.workspace}}/build/Release/EntLibAPIGenerator.exe -s build/Schemas -d build/EntGen -r
+        run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/EntLibAPIGenerator -s build/Schemas -d build/EntGen -r
           EntLibAPIGenerator/resources
       - name: Build Unit tests
-        run: cmake --build build --config Release --target TestEntityDLL
+        run: cmake --build build --config ${{matrix.BUILD_TYPE}} --target TestEntityDLL
       - name: Run Unit tests
         working-directory: ${{github.workspace}}/Test
-        run: ${{github.workspace}}/build/Release/TestEntityDLL.exe
+        run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/TestEntityDLL

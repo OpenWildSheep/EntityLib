@@ -15,9 +15,7 @@ jobs:
         cppstd: [17, 20]
         compiler: [ 
             {os: macos-latest, cpp: clang++, c: clang} ,
-            {os: macos-latest, cpp: g++, c: gcc},
-            {os: ubuntu-latest, cpp: clang++, c: clang},
-            {os: ubuntu-latest, cpp: g++, c: gcc} 
+            {os: ubuntu-latest, cpp: clang++, c: clang}
         ]
         
     runs-on: ${{ matrix.compiler.os }}

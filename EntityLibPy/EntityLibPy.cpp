@@ -90,14 +90,18 @@ void setPropValue(Property& node, Value const& val)
 {
     switch (node.getDataKind())
     {
-    case DataKind::array:
-    case DataKind::object:
-    case DataKind::union_:
+    case DataKind::array: [[fallthrough]];
+    case DataKind::object: [[fallthrough]];
+    case DataKind::union_: [[fallthrough]];
     case DataKind::boolean: node.setBool(std::visit(GetValue<bool>{}, val)); break;
     case DataKind::integer: node.setInt(std::visit(GetValue<int64_t>{}, val)); break;
     case DataKind::number: node.setFloat(std::visit(GetValue<double>{}, val)); break;
     case DataKind::string: node.setString(std::visit(GetValue<std::string>{}, val).c_str()); break;
     case DataKind::entityRef: node.setEntityRef({std::get<EntityRef>(val)}); break;
+    case DataKind::unionSet: [[fallthrough]];
+    case DataKind::map: [[fallthrough]];
+    case DataKind::objectSet: [[fallthrough]];
+    case DataKind::primitiveSet: [[fallthrough]];
     case DataKind::COUNT: ENTLIB_LOGIC_ERROR("Invalid Datatype");
     }
 }

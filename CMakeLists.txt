@@ -27,7 +27,7 @@ target_include_directories(EntityLib INTERFACE EntityLib/include)
 target_compile_definitions(EntityLib PUBLIC ENTLIB_STATIC)
 
 file(GLOB ENTITYLIBPY_SOURCES "EntityLibPy/*.cpp" "EntityLibPy/*.h" "EntityLibPy/*.hpp")
-add_library(EntityLibPy SHARED ${ENTITYLIBPY_SOURCES})
+add_library(EntityLibPy STATIC ${ENTITYLIBPY_SOURCES})
 target_include_directories(EntityLibPy PRIVATE submodules/pybind11/include)
 find_package(PythonLibs REQUIRED COMPONENTS Interpreter Development)
 if (NOT PYTHONLIBS_FOUND)

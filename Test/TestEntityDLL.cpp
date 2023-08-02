@@ -638,7 +638,7 @@ TEST_CASE("Test Properties", "[all]")
     SECTION("W")
     {
         auto ent = Gen::Entity::loadCopy(entlib, "prefab.copy.entity");
-        auto const newNodeCachesize = entlib.getJsonDatabase().size();
+        entlib.getJsonDatabase().size();
         auto testEntityRef = ent.Components().TestEntityRef();
         CHECK(testEntityRef.has_value());
         CHECK(testEntityRef->TestRef().isSet());

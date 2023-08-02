@@ -21,7 +21,7 @@ endif()
 
 file(GLOB ENTITYLIB_SOURCES "EntityLib/*.cpp" "EntityLib/*.h" "EntityLib/*.hpp" "EntityLib/include/EntityLib/*.h")
 add_library(EntityLib STATIC ${ENTITYLIB_SOURCES})
-target_include_directories(EntityLib SYSTEM PRIVATE EntityLib/external)
+target_include_directories(EntityLib PUBLIC EntityLib/external)
 target_include_directories(EntityLib SYSTEM PRIVATE EntityLib/external/valijson/include)
 target_include_directories(EntityLib INTERFACE EntityLib/include)
 target_compile_definitions(EntityLib PUBLIC ENTLIB_STATIC)

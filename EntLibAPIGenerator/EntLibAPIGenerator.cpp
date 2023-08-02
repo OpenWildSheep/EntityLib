@@ -11,12 +11,12 @@
 #include <filesystem>
 
 #include <iostream>
-WARNING_PUSH
-DISABLE_WARNING(SIGNED_UNSIGNED_MISMATCH)
+RAH2_WARNING_PUSH
+RAH2_DISABLE_WARNING(RAH2_SIGNED_UNSIGNED_MISMATCH)
 #include <mustache.hpp>
-WARNING_POP
+RAH2_WARNING_POP
 #include <cxxopts.hpp>
-#include "../EntityLib/external/json.hpp"
+#include <json.hpp>
 
 using namespace kainjow::mustache;
 using namespace nlohmann;
@@ -145,6 +145,9 @@ data jsonToMustache(json const& _input)
     case json::value_t::number_integer: return data(std::to_string(_input.get<int64_t>()));
     case json::value_t::number_unsigned: return data(std::to_string(_input.get<uint64_t>()));
     case json::value_t::string: return data(_input.get<std::string>());
+    case json::value_t::null: [[fallthrough]];
+    case json::value_t::binary: [[fallthrough]];
+    case json::value_t::discarded: break;
     }
     return {false};
 }

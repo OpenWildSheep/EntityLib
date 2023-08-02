@@ -2,15 +2,15 @@
 
 #include "include/EntityLib/EntityLibCore.h"
 
-WARNING_PUSH
-DISABLE_WARNING(UNREACHABLE_CODE)
-DISABLE_WARNING(DEPRECATED_DECLARATION)
+RAH2_WARNING_PUSH
+RAH2_DISABLE_WARNING(RAH2_UNREACHABLE_CODE)
+RAH2_DISABLE_WARNING(RAH2_DEPRECATED_DECLARATION)
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/utils/nlohmann_json_utils.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
 #include <valijson/validator.hpp>
-WARNING_POP
+RAH2_WARNING_POP
 #include "Tools.h"
 #include "include/EntityLib/Schema.h"
 

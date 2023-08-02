@@ -3,7 +3,7 @@
 #include <set>
 #include <filesystem>
 
-#include "external/json.hpp"
+#include <json.hpp>
 
 #include "include/EntityLib/Schema.h"
 

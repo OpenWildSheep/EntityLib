@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <string_view>
 
-#include "external/json.hpp"
+#include <json.hpp>
 
 namespace Ent
 {

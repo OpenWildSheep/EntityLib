@@ -2,7 +2,7 @@
 
 #include "Tools.h"
 #include "SchemaLoader.h"
-#include "external/json.hpp"
+#include <json.hpp>
 #include "include/EntityLib/Property.h"
 
 #include <iostream>

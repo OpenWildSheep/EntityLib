@@ -1,7 +1,5 @@
 #include "ValidJson.h"
 
-#pragma warning(push, 0)
-#pragma warning(disable : 4702)
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/utils/nlohmann_json_utils.hpp>
 #include <valijson/schema.hpp>
@@ -9,7 +7,6 @@
 #include <valijson/validator.hpp>
 #include <regex>
 #include <ciso646>
-#pragma warning(pop)
 
 #include "Tools.h"
 #include "include/EntityLib/EntityLibCore.h"

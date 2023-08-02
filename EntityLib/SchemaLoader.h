@@ -3,9 +3,7 @@
 #include <set>
 #include <filesystem>
 
-#pragma warning(push, 0)
 #include "external/json.hpp"
-#pragma warning(pop)
 
 #include "include/EntityLib/Schema.h"
 

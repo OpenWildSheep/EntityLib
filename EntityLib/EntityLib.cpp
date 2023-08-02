@@ -2,22 +2,14 @@
 
 #include "Tools.h"
 #include "SchemaLoader.h"
-// #include "include/EntityLib/ComponentMerge.h"
+#include "external/json.hpp"
+#include "include/EntityLib/Property.h"
 
-#pragma warning(push, 0)
-#pragma warning(disable : 4702)
 #include <iostream>
 #include <fstream>
-#include <set>
-// #include <sstream>
 #include <utility>
 #include <ciso646>
 #include <thread>
-
-#include "external/json.hpp"
-// #include "ValidJson.h"
-#include "include/EntityLib/Property.h"
-#pragma warning(pop)
 
 /// \cond PRIVATE
 

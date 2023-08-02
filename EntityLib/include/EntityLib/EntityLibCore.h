@@ -10,9 +10,20 @@
 #include <array>
 #include <filesystem>
 
-#pragma warning(push, 0)
+#if defined(_MSC_VER)
+#define WARNING_PUSH __pragma(warning(push))
+#define WARNING_POP __pragma(warning(pop))
+#define DISABLE_WARNING(warningNumber) __pragma(warning(disable : warningNumber))
+#define ENABLE_WARNING(warningNumber) __pragma(warning(1 : warningNumber))
+#else
+#define DO_PRAGMA(X) _Pragma(#X)
+#define WARNING_PUSH DO_PRAGMA(GCC diagnostic push)
+#define WARNING_POP DO_PRAGMA(GCC diagnostic pop)
+#define DISABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic ignored warningName)
+#define ENABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic warning warningName)
+#endif
+
 #include "../Exception.h"
-#pragma warning(pop)
 
 #ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT

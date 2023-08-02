@@ -30,7 +30,7 @@ namespace Ent
         {
             m_filePath = _filePath;
         }
-        m_schema = Schema{{_schema}};
+        m_schema = Schema{_schema};
         _setRawJson(_document);
     }
 
@@ -587,6 +587,7 @@ namespace Ent
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
+            default: ENTLIB_LOGIC_ERROR("Unexpected DataKind");
             }
             break;
         }

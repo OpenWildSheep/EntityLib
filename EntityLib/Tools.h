@@ -3,9 +3,7 @@
 #include <filesystem>
 #include <string_view>
 
-#pragma warning(push, 0)
-#include "external/json.hpp"
-#pragma warning(pop)
+#include <json.hpp>
 
 namespace Ent
 {

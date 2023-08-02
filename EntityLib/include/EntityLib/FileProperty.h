@@ -4,11 +4,8 @@
 #include <variant>
 #include <set>
 
-#pragma warning(push)
-#pragma warning(disable : 4464)
 #include "Schema.h"
 #include "../../Tools.h"
-#pragma warning(pop)
 
 namespace Ent
 {

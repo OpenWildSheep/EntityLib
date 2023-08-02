@@ -1,14 +1,11 @@
 #pragma once
 
-#pragma warning(push, 0)
 #include <map>
 #include <memory>
 #include <vector>
 #include <variant>
 #include <optional>
-
-#include "../external/json.hpp"
-#pragma warning(pop)
+#include <json.hpp>
 
 #include "EntityLibCore.h"
 
@@ -317,8 +314,8 @@ namespace Ent
         /// @endcond
     };
 
-#pragma warning(push)
-#pragma warning(disable : 4702)
+    RAH2_WARNING_PUSH
+    RAH2_DISABLE_WARNING(RAH2_UNREACHABLE_CODE)
     /// @cond PRIVATE
 
     /// variant visitor to get a specifique field in a Subschema::BaseMeta
@@ -426,6 +423,6 @@ namespace Ent
 
     /// @endcond
 
-#pragma warning(pop)
+    RAH2_WARNING_POP
 
 } // namespace Ent

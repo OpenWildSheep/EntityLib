@@ -4,14 +4,12 @@
 #include <EntityLib/Property.h>
 #include <EntityLib/SearchProperty.h>
 
-#pragma warning(push, 0)
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 
 #include "EntityLib/DumpProperty.h"
 #include "external/pybind11_json.hpp"
-#pragma warning(pop)
 
 /// @cond PRIVATE
 

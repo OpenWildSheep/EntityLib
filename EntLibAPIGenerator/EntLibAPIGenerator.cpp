@@ -10,12 +10,13 @@
 #include <regex>
 #include <filesystem>
 
-#pragma warning(push, 0)
 #include <iostream>
+WARNING_PUSH
+DISABLE_WARNING(SIGNED_UNSIGNED_MISMATCH)
 #include <mustache.hpp>
+WARNING_POP
 #include <cxxopts.hpp>
 #include "../EntityLib/external/json.hpp"
-#pragma warning(pop)
 
 using namespace kainjow::mustache;
 using namespace nlohmann;

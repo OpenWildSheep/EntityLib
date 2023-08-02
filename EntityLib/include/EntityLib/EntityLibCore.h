@@ -15,12 +15,18 @@
 #define WARNING_POP __pragma(warning(pop))
 #define DISABLE_WARNING(warningNumber) __pragma(warning(disable : warningNumber))
 #define ENABLE_WARNING(warningNumber) __pragma(warning(1 : warningNumber))
+#define UNREACHABLE_CODE 4702
+#define SIGNED_UNSIGNED_MISMATCH 4245
+#define DEPRECATED_DECLARATION 4996
 #else
 #define DO_PRAGMA(X) _Pragma(#X)
 #define WARNING_PUSH DO_PRAGMA(GCC diagnostic push)
 #define WARNING_POP DO_PRAGMA(GCC diagnostic pop)
 #define DISABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic ignored warningName)
 #define ENABLE_WARNING(warningName) DO_PRAGMA(GCC diagnostic warning warningName)
+#define UNREACHABLE_CODE "-Wunreachable-code"
+#define SIGNED_UNSIGNED_MISMATCH "-Wobjc-string-compare"
+#define DEPRECATED_DECLARATION "-Wdeprecated-declarations"
 #endif
 
 #include "../Exception.h"

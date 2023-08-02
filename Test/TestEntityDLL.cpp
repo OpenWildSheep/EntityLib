@@ -1,11 +1,9 @@
-#pragma warning(push, 0)
 #include <ciso646>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #include <cxxopts.hpp>
-#pragma warning(pop)
 
 #include <EntityLib/EntityLib.h>
 #include <EntGen.h>

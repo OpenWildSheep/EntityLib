@@ -30,16 +30,16 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}} --target EntLibAPIGenerator
       run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}} --target UpdateSchemas
-     
+
     - name: Merge UnitTest Schemas
       run: "build/Release/UpdateSchemas" -o build/Schemas -e DemoSchemas/EditionComponents.json,DemoSchemas/Scene-schema.json -r DemoSchemas/RuntimeComponents.json
-    
+
     - name: Generate EntGen API
       run: "build/Release/EntLibAPIGenerator" -s build/Schemas -d build/EntGen -r EntLibAPIGenerator/resources
 
     - name: Build Unit tests
       run: cmake --build build --config Release --target TestEntityDLL
-     
+
     - name: Run Unit tests
       working-directory: ${{github.workspace}}/Test
       run: "../build/Release/TestEntityDLL"

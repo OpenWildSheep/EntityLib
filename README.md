@@ -20,13 +20,8 @@ Lets say you doesn't need the python binding or you have only one python install
  - Ensure you have **cmake** installed
  - Run the **build.bat** or **build.sh** file. 
 ## The hard way
- - For windows/msvc users the code is:
+
 ```bat
-cmake -B build
-cmake --build build --config Release --target BuildAllButUnitTests
-```
- - For linux/macos users the code is:
-```sh
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release --target BuildAllButUnitTests
 ```
@@ -49,6 +44,7 @@ You can do this for several python version on the same machine. Just change the 
 # Run unit test
 
 You can just run the **run_unit_tests.bat** or **run_unit_tests.sh**
+Or:
 
 ### Merge Custom schemas with Engine schemas
 ```bat

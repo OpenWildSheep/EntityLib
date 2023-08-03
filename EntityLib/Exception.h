@@ -113,7 +113,7 @@ void ContextException::addContextMessage(char const* _message, Args&&... args) n
     }
 
     inline ToolsException::ToolsException(char const* _message) noexcept
-        : std::runtime_error(_message)
+        : std::runtime_error(_message == nullptr ? "" : _message)
     {
     }
 

@@ -20,7 +20,8 @@ namespace std
 
 #undef COMPILER_VERSION
 
-namespace Ent{
+namespace Ent
+{
 
     char const* formatPath(std::filesystem::path const& _base, std::filesystem::path const& _rel);
 

@@ -2,22 +2,14 @@
 
 #include "Tools.h"
 #include "SchemaLoader.h"
-// #include "include/EntityLib/ComponentMerge.h"
+#include <json.hpp>
+#include "include/EntityLib/Property.h"
 
-#pragma warning(push, 0)
-#pragma warning(disable : 4702)
 #include <iostream>
 #include <fstream>
-#include <set>
-// #include <sstream>
 #include <utility>
 #include <ciso646>
 #include <thread>
-
-#include "external/json.hpp"
-// #include "ValidJson.h"
-#include "include/EntityLib/Property.h"
-#pragma warning(pop)
 
 /// \cond PRIVATE
 
@@ -339,9 +331,9 @@ namespace Ent
 
     std::optional<Property> EntityLib::getParentEntity(Property const& _node) const
     {
-        if (auto* const parent = _node.getPimpl().getParent().get())
+        if (auto const& parent = _node.getPimpl().getParent())
         {
-            if (auto ptr = getSceneParentEntity(parent))
+            if (auto ptr = getSceneParentEntity(parent.get()))
             {
                 return Property{std::move(ptr)};
             }

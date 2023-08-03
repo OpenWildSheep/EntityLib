@@ -10,9 +10,31 @@
 #include <array>
 #include <filesystem>
 
-#pragma warning(push, 0)
+#if defined(_MSC_VER)
+#define RAH2_WARNING_PUSH __pragma(warning(push))
+#define RAH2_WARNING_POP __pragma(warning(pop))
+#define RAH2_DISABLE_WARNING(warningNumber) __pragma(warning(disable : warningNumber))
+#define RAH2_ENABLE_WARNING(warningNumber) __pragma(warning(1 : warningNumber))
+#define RAH2_UNREACHABLE_CODE 4702
+#define RAH2_SIGNED_UNSIGNED_MISMATCH 4245
+#define RAH2_DEPRECATED_DECLARATION 4996
+#elif defined(__clang__) || defined(__GNUC__)
+#define RAH2_DO_PRAGMA(X) _Pragma(#X)
+#define RAH2_WARNING_PUSH RAH2_DO_PRAGMA(GCC diagnostic push)
+#define RAH2_WARNING_POP RAH2_DO_PRAGMA(GCC diagnostic pop)
+#define RAH2_DISABLE_WARNING(warningName) RAH2_DO_PRAGMA(GCC diagnostic ignored warningName)
+#define RAH2_ENABLE_WARNING(warningName) RAH2_DO_PRAGMA(GCC diagnostic warning warningName)
+#define RAH2_UNREACHABLE_CODE "-Wunreachable-code"
+#define RAH2_SIGNED_UNSIGNED_MISMATCH "-Wobjc-string-compare"
+#define RAH2_DEPRECATED_DECLARATION "-Wdeprecated-declarations"
+#else
+#define RAH2_WARNING_PUSH
+#define RAH2_WARNING_POP
+#define RAH2_DISABLE_WARNING(warningName)
+#define RAH2_ENABLE_WARNING(warningName)
+#endif
+
 #include "../Exception.h"
-#pragma warning(pop)
 
 #ifdef ENTLIB_STATIC
 #define ENTLIB_DLLEXPORT

@@ -2,10 +2,7 @@
 
 #include <functional>
 
-#pragma warning(push)
-#pragma warning(disable : 4464)
-#include "../PropImpl.h"
-#pragma warning(pop)
+#include "../../PropImpl.h"
 
 namespace Ent
 {

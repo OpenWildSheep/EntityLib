@@ -56,23 +56,23 @@ namespace Ent{
         addContextMessage(message, std::forward<Args>(args)...);
     }
 
-    template <typename... Args>
-    void ContextException::addContextMessage(char const* _message, Args&&... args) noexcept
+template <typename... Args>
+void ContextException::addContextMessage(char const* _message, Args&&... args) noexcept
+{
+    try
     {
-        try
-        {
-            auto const written = snprintf(nullptr, 0, _message, std::forward<Args>(args)...);
-            m_rawContext.emplace_back(written + 1);
-            snprintf(
-                m_rawContext.back().data(),
-                m_rawContext.back().size(),
-                _message,
-                std::forward<Args>(args)...);
-        }
-        catch (std::bad_alloc&)
-        {
-        }
+        auto const written = snprintf(nullptr, 0, _message, std::forward<Args>(args)...);
+        m_rawContext.emplace_back(written + 1);
+        snprintf(
+            m_rawContext.back().data(),
+            m_rawContext.back().size(),
+            _message,
+            std::forward<Args>(args)...);
     }
+    catch (std::bad_alloc&)
+    {
+    }
+}
 
     /// A ContextException which is wrapping an external
     /// Usefull to add some context info on an exception which in not a ContextException

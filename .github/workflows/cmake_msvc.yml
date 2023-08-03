@@ -1,0 +1,43 @@
+---
+name: cmake_msvc
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    strategy:
+      matrix:
+        BUILD_TYPE:
+          - Debug
+          - Release
+        cppstd:
+          - 17
+          - 20
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build
+          -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
+          -DCMAKE_CXX_STANDARD=${{matrix.cppstd}}
+      - name: Build EntityLib (and other tools)
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
+          --target BuildAllButUnitTests
+      - name: Merge UnitTest Schemas
+        run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/UpdateSchemas -o build/Schemas -e
+          DemoSchemas/EditionComponents.json,DemoSchemas/Scene-schema.json -r
+          DemoSchemas/RuntimeComponents.json
+      - name: Generate EntGen API
+        run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/EntLibAPIGenerator -s build/Schemas -d build/EntGen -r
+          EntLibAPIGenerator/resources
+      - name: Build Unit tests
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
+      - name: Run Unit tests
+        working-directory: ${{github.workspace}}/Test
+        run: ${{github.workspace}}/build/${{matrix.BUILD_TYPE}}/TestEntityDLL

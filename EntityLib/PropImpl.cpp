@@ -1924,7 +1924,7 @@ namespace Ent
                 else if constexpr (std::is_same_v<KeyType, int64_t>)
                 {
                     char buff[64];
-                    snprintf(buff, sizeof(buff), "%lld", static_cast<int64_t>(_key));
+                    snprintf(buff, sizeof(buff), "%lld", static_cast<long long>(_key));
                     return std::string(buff);
                 }
                 else

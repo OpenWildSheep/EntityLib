@@ -34,7 +34,7 @@ std::ofstream openOfstream(path const& _filepath)
     file.open(_filepath);
     if (not file.is_open())
     {
-        throw FileSystemError("Trying to open file for write", path(), _filepath);
+        throw Ent::FileSystemError("Trying to open file for write", path(), _filepath);
     }
     return file;
 }

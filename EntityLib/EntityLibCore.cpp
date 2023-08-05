@@ -23,35 +23,11 @@ namespace Ent
 #endif
     }
 
-    char const* formatPath(
-        [[maybe_unused]] std::filesystem::path const& _basePath, std::filesystem::path const& _rel)
-    {
-        thread_local static char buffer[2048];
-        snprintf(buffer, sizeof(buffer), R"("%s")", _rel.generic_string().c_str());
-        return buffer;
-    }
-
     Exception::Exception(char const* _message)
         : std::runtime_error(_message)
     {
     }
 
-    FileSystemError::FileSystemError(
-        std::string const& _msg,
-        std::filesystem::path const& _rootPath,
-        std::filesystem::path const& _relPath,
-        std::error_code _error)
-        : ContextException(makeWhatMessage(_msg, _rootPath, _relPath, _error))
-    {
-    }
-    FileSystemError::FileSystemError(
-        std::string const& _msg,
-        std::filesystem::path const& _rootPath,
-        std::filesystem::path const& _relPath)
-        : FileSystemError(
-            _msg, _rootPath, _relPath, std::make_error_code(static_cast<std::errc>(errno)))
-    {
-    }
 
     BadType::BadType(char const* _message)
         : ContextException(_message == nullptr ? "Bad node type" : _message)

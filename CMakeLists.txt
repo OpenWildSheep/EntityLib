@@ -48,11 +48,11 @@ target_include_directories(TestEntGen PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/EntGen
 target_link_libraries(TestEntGen EntityLib)
 
 file(GLOB TESTENTITYLIB_SOURCES "Test/*.cpp" "Test/*.h" "Test/*.hpp")
-add_executable(TestEntityDLL ${TESTENTITYLIB_SOURCES})
-target_include_directories(TestEntityDLL PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/EntGen/cpp2)
-target_include_directories(TestEntityDLL PRIVATE submodules/cxxopts/include)
-target_include_directories(TestEntityDLL PRIVATE external/catch)
-target_link_libraries(TestEntityDLL EntityLib)
+add_executable(UnitTest ${TESTENTITYLIB_SOURCES})
+target_include_directories(UnitTest PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/EntGen/cpp2)
+target_include_directories(UnitTest PRIVATE submodules/cxxopts/include)
+target_include_directories(UnitTest PRIVATE external/catch)
+target_link_libraries(UnitTest EntityLib)
 
 file(GLOB UPDATESCHEMA_SOURCES "UpdateSchemas/*.cpp" "UpdateSchemas/*.h" "UpdateSchemas/*.hpp")
 add_executable(UpdateSchemas ${UPDATESCHEMA_SOURCES})

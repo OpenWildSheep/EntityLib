@@ -4,11 +4,8 @@
 #include <variant>
 #include <set>
 
-#pragma warning(push)
-#pragma warning(disable : 4464)
 #include "Schema.h"
 #include "../../Tools.h"
-#pragma warning(pop)
 
 namespace Ent
 {
@@ -295,6 +292,23 @@ namespace Ent
     inline DataKind FileProperty::getMapKeyKind() const
     {
         return getSchema()->getMapKeyKind();
+    }
+
+    template <typename T>
+    T FileProperty::get() const
+    {
+        if constexpr (std::is_same_v<T, char const*>)
+        {
+            return getJson()->get_ref<std::string const&>().c_str();
+        }
+        else if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
+        {
+            return EntityRef{getString()};
+        }
+        else
+        {
+            return getJson()->get<T>();
+        }
     }
 
 } // namespace Ent

@@ -1,11 +1,9 @@
-#pragma warning(push, 0)
 #include <ciso646>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #include <cxxopts.hpp>
-#pragma warning(pop)
 
 #include <EntityLib/EntityLib.h>
 #include <EntGen.h>
@@ -638,7 +636,7 @@ TEST_CASE("Test Properties", "[all]")
     SECTION("W")
     {
         auto ent = Gen::Entity::loadCopy(entlib, "prefab.copy.entity");
-        auto const newNodeCachesize = entlib.getJsonDatabase().size();
+        [[maybe_unused]] auto const newNodeCachesize = entlib.getJsonDatabase().size();
         auto testEntityRef = ent.Components().TestEntityRef();
         CHECK(testEntityRef.has_value());
         CHECK(testEntityRef->TestRef().isSet());

@@ -30,7 +30,7 @@ namespace Ent
         {
             m_filePath = _filePath;
         }
-        m_schema = Schema{{_schema}};
+        m_schema = Schema{_schema};
         _setRawJson(_document);
     }
 
@@ -587,6 +587,7 @@ namespace Ent
                 ENTLIB_ASSERT(newLayerJson != nullptr);
                 break;
             }
+            default: ENTLIB_LOGIC_ERROR("Unexpected DataKind");
             }
             break;
         }
@@ -764,23 +765,6 @@ namespace Ent
         wrapper[nameFieldName] = type;
         wrapper.erase(dataFieldName);
         _increaseVersion();
-    }
-
-    template <typename T>
-    T FileProperty::get() const
-    {
-        if constexpr (std::is_same_v<T, char const*>)
-        {
-            return getJson()->get_ref<std::string const&>().c_str();
-        }
-        else if constexpr (std::is_same_v<std::remove_const_t<std::remove_reference_t<T>>, EntityRef>)
-        {
-            return EntityRef{getString()};
-        }
-        else
-        {
-            return getJson()->get<T>();
-        }
     }
 
     double FileProperty::getFloat() const

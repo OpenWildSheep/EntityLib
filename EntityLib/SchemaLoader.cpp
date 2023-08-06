@@ -1,11 +1,9 @@
 #include "SchemaLoader.h"
 #include "Tools.h"
 
-#pragma warning(push, 0)
 #include <sstream>
 #include <utility>
 #include <ciso646>
-#pragma warning(pop)
 
 /// \cond PRIVATE
 

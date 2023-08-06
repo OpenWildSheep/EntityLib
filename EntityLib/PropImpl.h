@@ -5,11 +5,7 @@
 #include <deque>
 
 #include "include/EntityLib/FileProperty.h"
-
-#pragma warning(push)
-#pragma warning(disable : 4464)
 #include "Tools.h"
-#pragma warning(pop)
 
 namespace Ent
 {

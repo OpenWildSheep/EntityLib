@@ -997,13 +997,13 @@ namespace Ent
             return !(*this == _rho);
         }
         ENTLIB_PROP_CATCH
-        bool operator==(nullptr_t) const
+        bool operator==(std::nullptr_t) const
         try
         {
             return hasValue();
         }
         ENTLIB_PROP_CATCH
-        bool operator!=(nullptr_t) const
+        bool operator!=(std::nullptr_t) const
         try
         {
             return !hasValue();

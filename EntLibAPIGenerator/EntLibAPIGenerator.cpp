@@ -10,12 +10,13 @@
 #include <regex>
 #include <filesystem>
 
-#pragma warning(push, 0)
 #include <iostream>
+RAH2_WARNING_PUSH
+RAH2_DISABLE_WARNING(RAH2_SIGNED_UNSIGNED_MISMATCH)
 #include <mustache.hpp>
+RAH2_WARNING_POP
 #include <cxxopts.hpp>
-#include "../EntityLib/external/json.hpp"
-#pragma warning(pop)
+#include <json.hpp>
 
 using namespace kainjow::mustache;
 using namespace nlohmann;
@@ -33,7 +34,7 @@ std::ofstream openOfstream(path const& _filepath)
     file.open(_filepath);
     if (not file.is_open())
     {
-        throw FileSystemError("Trying to open file for write", path(), _filepath);
+        throw Ent::FileSystemError("Trying to open file for write", path(), _filepath);
     }
     return file;
 }
@@ -144,6 +145,9 @@ data jsonToMustache(json const& _input)
     case json::value_t::number_integer: return data(std::to_string(_input.get<int64_t>()));
     case json::value_t::number_unsigned: return data(std::to_string(_input.get<uint64_t>()));
     case json::value_t::string: return data(_input.get<std::string>());
+    case json::value_t::null: [[fallthrough]];
+    case json::value_t::binary: [[fallthrough]];
+    case json::value_t::discarded: break;
     }
     return {false};
 }

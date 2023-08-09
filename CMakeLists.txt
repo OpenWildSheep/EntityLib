@@ -68,7 +68,3 @@ target_include_directories(UnitTest PRIVATE submodules/cxxopts/include)
 target_include_directories(UnitTest PRIVATE external/catch)
 target_link_libraries(UnitTest EntityLib)
 
-file(GLOB UPDATESCHEMA_SOURCES "UpdateSchemas/*.cpp" "UpdateSchemas/*.h" "UpdateSchemas/*.hpp")
-add_executable(UpdateSchemas ${UPDATESCHEMA_SOURCES})
-target_include_directories(UpdateSchemas PRIVATE submodules/cxxopts/include)
-target_link_libraries(UpdateSchemas EntityLib)

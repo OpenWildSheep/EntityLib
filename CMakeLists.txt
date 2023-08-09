@@ -67,4 +67,4 @@ target_include_directories(UnitTest PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/EntGen/c
 target_include_directories(UnitTest PRIVATE submodules/cxxopts/include)
 target_include_directories(UnitTest PRIVATE external/catch)
 target_link_libraries(UnitTest EntityLib)
-
+add_test(UnitTest UnitTest)

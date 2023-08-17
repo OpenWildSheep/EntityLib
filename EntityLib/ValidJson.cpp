@@ -5,6 +5,7 @@
 RAH2_WARNING_PUSH
 RAH2_DISABLE_WARNING(RAH2_UNREACHABLE_CODE)
 RAH2_DISABLE_WARNING(RAH2_DEPRECATED_DECLARATION)
+RAH2_DISABLE_WARNING(RAH2_UNUSED_PARAMETER)
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/utils/nlohmann_json_utils.hpp>
 #include <valijson/schema.hpp>

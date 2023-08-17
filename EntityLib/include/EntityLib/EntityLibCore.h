@@ -18,6 +18,7 @@
 #define RAH2_UNREACHABLE_CODE 4702
 #define RAH2_SIGNED_UNSIGNED_MISMATCH 4245
 #define RAH2_DEPRECATED_DECLARATION 4996
+#define RAH2_UNUSED_PARAMETER 4100
 #elif defined(__clang__) || defined(__GNUC__)
 #define RAH2_DO_PRAGMA(X) _Pragma(#X)
 #define RAH2_WARNING_PUSH RAH2_DO_PRAGMA(GCC diagnostic push)
@@ -27,6 +28,7 @@
 #define RAH2_UNREACHABLE_CODE "-Wunreachable-code"
 #define RAH2_SIGNED_UNSIGNED_MISMATCH "-Wobjc-string-compare"
 #define RAH2_DEPRECATED_DECLARATION "-Wdeprecated-declarations"
+#define RAH2_UNUSED_PARAMETER "-Wunused-parameter"
 #else
 #define RAH2_WARNING_PUSH
 #define RAH2_WARNING_POP
